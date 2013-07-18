@@ -1,4 +1,8 @@
 /*
+** This helper file contians methods for parsing lines
+*/
+
+/*
 ** Replace all concatanated spaces to one space
 */
 void remove_double_spaces(char *line);
