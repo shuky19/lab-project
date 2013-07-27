@@ -4,7 +4,12 @@
 ** Start point of the assembler
 ** recieve as input files to compile
 */
-int main(int argc, char const *argv[])
+int main(int argc, char *argv[])
 {
-	return 0;
+	int i;
+
+	for (i = 0; i < argc; ++i)
+	{
+		parse_file(argv[i]);
+	}
 }

@@ -2,21 +2,32 @@
 ** This file resposible on managing file compilation
 ** line by line
 */
-#include <stdio.h>
 #include "counter.h"
 #include "structure.h"
 #include "line_parser.h"
+#include "file_writer.h"
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#define MAX_LINE 80
+#define MAX_EXTRIES_IN_FILE 80
 
 /*
 ** Compile file
 */
-void parse_file(char *filename);
+void parse_file(char *file_name);
 
 /*
-** Get next line in the file
+** First time the parser is running all over the 
+** commands, and filling all necessary tables
 */
-char *next_line(FILE *file);
+void first_round(FILE *file);
+
+/*
+** Second time the parser is running all over the 
+** commands, and filling symbols holes
+*/
+void second_round();
 
 /*
 ** Handle one line in the file
@@ -32,3 +43,19 @@ void handle_command(char *line);
 ** Handle an instruction line
 */
 void handle_instruction(char *line);
+
+/*
+** Runs over all commands and fill the correct symbol address
+** + add all external references
+*/
+void fix_symbol_references();
+
+/*
+** Runs over all entries symbol table and fill the correct symbol address
+*/
+void fix_entry_symbol_table();
+
+/*
+** Handle an external reference inside a command line
+*/
+void handle_external_reference(char *symbol_name, int line_address, command *comm);

@@ -8,33 +8,37 @@
 #define LINE_PARSER value
 #include "counter.h"
 #include "structure.h"
+#include <stdio.h>
+
+/*
+** Get next line in the file
+*/
+int next_line(FILE *file, char *buffer, size_t len);
 
 /*
 ** Return what kind of line represented by 
 ** the line parameter (COMMAND, INSTRUCTION, COMMENT, BLANK)
 */
-enum line_type get_line_type(char *line);
+line_type get_line_type(char *line);
 
 /*
 ** Create a command line from the given string
 */
-struct command_line get_command(char *line);
+command_line get_command_line(char *line);
 
 /*
 ** Create an instruction line from the given string
 */
-struct instruction_line get_instruction(char *line);
+instruction_line get_instruction_line(char *line);
 
 /*
-** Convert the command to binary code and
-** save it into the given command struct
+** Create a command from the given command_line
 */
-void set_command_data(struct command *comm, char *command_txt);
+command get_command(command_line *comm_line);
 
 /*
-** Convert the arguments to binary code and
-** save it into the given command struct
+** Assign symbol address to the command
 */
-void set_command_arguments(struct command *comm,struct symbols_table *sym_table, char *first_argument, char *second_argument);
+void assign_symbol_adderss(command *comm, int symbol_index, int symbol_address);
 
 #endif

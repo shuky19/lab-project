@@ -13,12 +13,12 @@
 ** COMMENT - comment line
 ** BLANK - empty line (only with white characters)
 */
-enum line_type { COMMAND, INSTRUCTION, COMMENT, BLANK };
+typedef enum { COMMAND, INSTRUCTION, COMMENT, BLANK } line_type;
 
 /*
 ** Binary representation a compiled line
 */
-struct command
+typedef struct
 {
 	unsigned int comb : 2;
 	unsigned int dest_reg : 3;
@@ -29,45 +29,70 @@ struct command
 	unsigned int type : 1;
 	unsigned int dbl : 1;
 	unsigned int : 2;
-};
+	unsigned int extra_words[4]; /* Represent words for addressing */
+	unsigned char extra_words_type[4]; /* Represent words type ('a', 'r', 'e') */
+	int extra_word_count; /* Describes the amount of word needed for addressing */
+	char *symbols_names[2]; /* Save the symbol index in the label_table */
+	int symbols_count;/* Describes the amount of symbols needed for addressing */
+	int address; /* Represent the starting address of this command */
+} command;
+
+typedef command *command_ptr;
 
 /*
 ** Structural representation of command type line
 */
-struct command_line
+typedef struct
 {
 	char *label;
 	char *command;
 	char *firstop;
 	char *secondop;
-};
+} command_line;
+
+/*
+** Structural representation of indtruction content
+** for entry: use symbol_name
+** for exterb: use symbol_name
+** for data: use data
+** for string: use strings
+*/
+typedef union
+{
+	unsigned int *data;
+	char *symbol_name;
+} instruction_content;
+
+/*
+** Represnt a type of instruction line in the source file
+** ENTRY - .entry line
+** EXTERN - .extern line
+** DATA - .data line
+** STRING - .string line
+*/
+typedef enum { ENTRY, EXTERN, DATA, STRING } instruction_line_type;
 
 /*
 ** Structural representation of instruction type line
 */
-struct instruction_line
+typedef struct
 {
 	char *label;
-	char *command;
-	char *arguements[3];
-};
+	instruction_line_type command;
+	instruction_content content;
+	int content_length;
+} instruction_line;
 
-/*
-** Structural representation of entry type line
-*/
-struct entry
-{
-	char *label;
-};
+typedef instruction_line *instruction_line_ptr;
 
 /*
 ** Create command line from the given arguments
 */
-struct command_line make_command_line(char *label, char *command, char *firstop, char *secondop);
+command_line make_command_line(char *label, char *command, char *firstop, char *secondop);
 
 /*
 ** Create instruction line from the given arguments
 */
-struct instruction_line make_instruction_line(char *label, char *command, char *arguemtns[]);
+instruction_line make_instruction_line(char *label, char *command, char *arguemtns[]);
 
 #endif

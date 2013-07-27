@@ -1,33 +1,81 @@
 #include "file_parser.h"
 
-struct instructions_counter *ic;
-struct data_counter *dc;
-struct symbols_table *sym_table;
+instructions_counter *ic;
+data_counter *dc;
+symbols_table *sym_table;
+symbols_table *entry_sym_table;
+symbols_table *external_sym_table;
+data_counter *external_counter;
 
 /*
 ** Compile file
 */
-void parse_file(char *filename)
+void parse_file(char *file_name)
 {
-	/* Initialize all variables */
-	char *line;
-	FILE *file;
+	/* TODO: Initialize all variables */
+	FILE *file = open_file(file_name, "ass");
 
-	while((line = next_line(file)) != NULL)
+	/* This round will parse line by line the file
+	** and will build all table like that:
+	** 	- command line : will parsed (symbols referece will be left out as names)
+	**					 and will be saved in 'ic' table
+	**  - data + string: will be parsed and saved in 'dc' table
+	**  - entry lines  : will be saved in entry_sym_table
+	**  - extern lines : will be saved in external_symbols table
+	*/
+	first_round(file);
+
+	/* This round will fix the following:
+	**  - all symbols references in all 'ic' table rows
+	**  - all symbols references in external_sym_table
+	**  - all symbols references in entry_sym_table
+	*/
+	second_round();
+
+	/* Write all files acourding to tables */
+	write_files(file_name, ic, dc, sym_table, entry_sym_table, external_sym_table);
+
+	close_file(file);
+}
+
+/*
+** First time the parser is running all over the 
+** commands, and filling all necessary tables
+*/
+void first_round(FILE *file)
+{
+	char *line;
+
+	while(next_line(file,line, MAX_LINE) != -1)
 	{
 		handle_line(line);
 		free(line);
 	}
+
+	fclose(file);
 }
 
 /*
-** Get next line in the file
+** Second time the parser is running all over the 
+** commands, and filling symbols holes
 */
-char *next_line(FILE *file)
+void second_round()
 {
+	/* This step will fix the following:
+	**  - all symbols references in all 'ic' table rows
+	**  - all symbols addresses in external_sym_table
+	*/
+	fix_symbol_references();
 
+	/* This step will fix the following:
+	**  - all symbols addresses in entry_sym_table
+	*/
+	fix_entry_symbol_table();
 }
 
+/*
+** Handle one line in the file
+*/
 void handle_line(char *line)
 {
 	switch (get_line_type(line))
@@ -49,27 +97,138 @@ void handle_line(char *line)
 	}
 }
 
-
+/*
+** Handle a command line
+*/
 void handle_command(char *line)
 {
-	struct command comm;
-	struct command_line comm_line = get_command(line);
-	set_command_data(&comm, comm_line.command);
+	// Get the parsed command
+	command_line comm_line = get_command_line(line);
 
-	set_command_arguments(&comm, sym_table, comm_line.firstop, comm_line.secondop);
-
-	// If this line contains symbols
-	// add them to sym_table
+	// Compile the command (Symbols references are left with names)
+	command comm = get_command(&comm_line);
+	
+	/* If this line contains symbols
+	   add them to sym_table */
 	if (comm_line.label != NULL)
 	{
-		add_symbol(sym_table, comm_line.label, ic->counter);
+		add_symbol(sym_table, comm_line.label, ic->word_counter, COMMAND_TABLE);
 	}
 
-	// Add command to the instructions table
-	ic->instructions[ic->counter++] = comm;
+	/* Add the instruction to the intruction counter */
+	add_instruction(ic, &comm);
 }
 
+/*
+** Handle an instruction line
+*/
 void handle_instruction(char *line)
 {
+	// Get parsed instruction
+	instruction_line inst_line = get_instruction_line(line);
 
+	if (inst_line.command == DATA || inst_line.command == STRING)
+	{
+		/* If this line contains symbols
+		   add them to sym_table */
+		if (inst_line.label != NULL)
+		{
+			/* Temporsrly insert 0, because data section should start 
+			   after instruction section. this value will be overided
+			   later */
+			add_symbol(sym_table, inst_line.label, 0, DATA_TABLE);
+
+		}
+
+		/* Add the instruction to the instruction counter */
+		add_data(dc, &inst_line);	
+	}
+	else if (inst_line.command == EXTERN)
+	{
+		/* Add external instruction to the external couter */
+		add_data(external_counter, &inst_line);
+	}
+	else if (inst_line.command == ENTRY)
+	{
+		/* Add to entry symbols table with no address */
+		add_symbol(entry_sym_table, inst_line.content.symbol_name, 0, ENTRY_TABLE);
+	}
+	else
+	{
+		printf("Unknow instruction type\n");
+		exit(1);
+	}
+}
+
+/*
+** Runs over all commands and fill the correct symbol address
+** + add all external references
+*/
+void fix_symbol_references()
+{
+	int i;
+
+	/* Run over all commands */
+	for (i = 0; i < ic->index; ++i)
+	{
+		int j;
+		command *current_command = ic->instructions[0];
+		
+		/* Run over all needed symbols */
+		for (j = 0; j < current_command->symbols_count; ++j)
+		{
+			char *symbol_name = current_command->symbols_names[j];
+
+			/* Try find symbol in symbol table */
+			int address = get_symbol_address(sym_table, symbol_name);
+
+			/* If symbol was not found */ 
+			if( address == -1)
+			{
+				/* It's an external symbol reference */ 
+				handle_external_reference(symbol_name, current_command->address, current_command);
+			}
+			else
+			{
+				assign_symbol_adderss(current_command, j, address);
+			}
+		}
+	}
+}
+
+/*
+** Runs over all entries symbol table and fill the correct symbol address
+*/
+void fix_entry_symbol_table()
+{
+	int i;
+
+	/* Run over all entry symbols */
+	for (i = 0; i < entry_sym_table->counter; ++i)
+	{
+		symbol *entry_symbol = entry_sym_table->symbols[i];
+		entry_symbol->address = get_symbol_address(sym_table, entry_symbol->name);
+	}
+}
+
+/*
+** Handle an external reference inside a command line
+*/
+void handle_external_reference(char *symbol_name, int line_address, command *comm)
+{
+	int i;
+
+	/* Run over all entry symbols */
+	for (i = 0; i < external_counter->index; ++i)
+	{
+		char *external_symbol = external_counter->data[i]->content.symbol_name;
+
+		/* If symbol found in this external symbol */
+		if (strncmp(symbol_name, external_symbol, MAX_SYMBOL_LENGTH) == 0)
+		{
+			/* Add symbol to the external symbols table */
+			add_symbol(external_sym_table, symbol_name, comm->address, EXTERNAL_TABLE);
+			break;
+		}
+	}
 }

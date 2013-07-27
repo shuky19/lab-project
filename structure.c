@@ -7,17 +7,17 @@
 /*
 ** Create command line from the given arguments
 */
-struct command_line make_command_line(char *label, char *command, char *firstop, char *secondop)
+command_line make_command_line(char *label, char *command, char *firstop, char *secondop)
 {
-	struct command_line cl;
+	command_line cl;
 	return cl;
 }
 
 /*
 ** Create instruction line from the given arguments
 */
-struct instruction_line make_instruction_line(char *label, char *command, char *arguemtns[])
+instruction_line make_instruction_line(char *label, char *command, char *arguemtns[])
 {
-	struct instruction_line il;
+	instruction_line il;
 	return il;
 }
