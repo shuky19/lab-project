@@ -15,7 +15,7 @@
 struct instructions_counter
 {
 	int counter;
-	command instructions[MAX];
+	struct command instructions[MAX];
 };
 
 /*
@@ -48,20 +48,20 @@ struct symbols_table
 /*
 ** Find a symbol in the given symbol table
 */
-struct symbol *get_symbol(symbols_table *table, char *symbol_name);
+struct symbol *get_symbol(struct symbols_table *table, char *symbol_name);
 
 /*
 ** add new symbol to the given symbol table
 */
-void add_symbol(symbols_table *table, char *name, int line_number);
+void add_symbol(struct symbols_table *table, char *name, int line_number);
 
 /*
 ** add new data to the given data counter
 */
-void add_data(data_counter *dc, int data);
+void add_data(struct data_counter *dc, int data);
 
 /*
 ** add new symbol to the given instruction counter
 */
-void add_instruction(instructions_counter *ic, command *comm);
+void add_instruction(struct instructions_counter *ic, struct command *comm);
 #endif

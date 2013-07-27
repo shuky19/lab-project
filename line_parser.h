@@ -7,6 +7,7 @@
 #ifndef LINE_PARSER
 #define LINE_PARSER value
 #include "counter.h"
+#include "structure.h"
 
 /*
 ** Return what kind of line represented by 

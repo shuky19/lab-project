@@ -2,10 +2,11 @@
 ** This file resposible on managing file compilation
 ** line by line
 */
-
-#include "stdio.h"
+#include <stdio.h>
 #include "counter.h"
-#include "stdlib.h"
+#include "structure.h"
+#include "line_parser.h"
+#include <stdlib.h>
 
 /*
 ** Compile file

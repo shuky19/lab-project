@@ -1,4 +1,5 @@
 #include "line_parser.h"
+#include <stdlib.h>
 
 enum line_type get_line_type(char *line)
 {
@@ -7,13 +8,13 @@ enum line_type get_line_type(char *line)
 
 struct command_line get_command(char *line)
 {
-	command_line cm = {};
-	return cm;
+	struct command_line cl;
+	return cl;
 }
 
 struct instruction_line get_instruction(char *line)
 {
-	instruction_line il ={};
+	struct instruction_line il;
 	return il;
 }
 

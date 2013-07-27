@@ -49,7 +49,7 @@ struct instruction_line
 {
 	char *label;
 	char *command;
-	char *arguements[];
+	char *arguements[3];
 };
 
 /*

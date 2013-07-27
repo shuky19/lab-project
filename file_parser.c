@@ -1,5 +1,4 @@
 #include "file_parser.h"
-#include "line_parser.h"
 
 struct instructions_counter *ic;
 struct data_counter *dc;
@@ -53,15 +52,15 @@ void handle_line(char *line)
 
 void handle_command(char *line)
 {
-	command comm;
-	command_line comm_line = get_command(line);
+	struct command comm;
+	struct command_line comm_line = get_command(line);
 	set_command_data(&comm, comm_line.command);
 
 	set_command_arguments(&comm, sym_table, comm_line.firstop, comm_line.secondop);
 
 	// If this line contains symbols
 	// add them to sym_table
-	if( comm_line.label != NULL)
+	if (comm_line.label != NULL)
 	{
 		add_symbol(sym_table, comm_line.label, ic->counter);
 	}
