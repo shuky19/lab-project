@@ -2,18 +2,25 @@
 
 instructions_counter *ic;
 data_counter *dc;
+data_counter *external_counter;
 symbols_table *sym_table;
 symbols_table *entry_sym_table;
 symbols_table *external_sym_table;
-data_counter *external_counter;
 
 /*
 ** Compile file
 */
 void parse_file(char *file_name)
 {
-	/* TODO: Initialize all variables */
+	initialize();
+
 	FILE *file = open_file(file_name, "ass");
+
+	if (file == NULL)
+	{
+		printf("File not exists: %s.ass\n",file_name);
+		return;
+	}
 
 	/* This round will parse line by line the file
 	** and will build all table like that:
@@ -44,15 +51,14 @@ void parse_file(char *file_name)
 */
 void first_round(FILE *file)
 {
-	char *line;
-
-	while(next_line(file,line, MAX_LINE) != -1)
-	{
+	int i =4;
+	char *line = (char *)calloc(MAX_LINE_LENGTH, sizeof(char));
+	while(next_line(file,line, MAX_LINE_LENGTH) != -1)
+	{		
 		handle_line(line);
-		free(line);
 	}
-
-	fclose(file);
+	
+	free(line);
 }
 
 /*
@@ -103,20 +109,20 @@ void handle_line(char *line)
 void handle_command(char *line)
 {
 	// Get the parsed command
-	command_line comm_line = get_command_line(line);
+	command_line *comm_line = get_command_line(line);
 
 	// Compile the command (Symbols references are left with names)
-	command comm = get_command(&comm_line);
+	command *comm = get_command(comm_line);
 	
 	/* If this line contains symbols
 	   add them to sym_table */
-	if (comm_line.label != NULL)
+	if (comm_line->label != NULL)
 	{
-		add_symbol(sym_table, comm_line.label, ic->word_counter, COMMAND_TABLE);
+		add_symbol(sym_table, comm_line->label, ic->word_counter, COMMAND_TABLE);
 	}
 
 	/* Add the instruction to the intruction counter */
-	add_instruction(ic, &comm);
+	add_instruction(ic, comm);
 }
 
 /*
@@ -231,4 +237,17 @@ void handle_external_reference(char *symbol_name, int line_address, command *com
 			break;
 		}
 	}
+}
+
+/**
+** Initialize all tables and counters
+*/
+void initialize()
+{
+	ic = create_instruction_counter();
+	dc = create_data_counter();
+	external_counter = create_data_counter();
+	sym_table = create_symbol_table();
+	entry_sym_table = create_symbol_table();
+	external_sym_table = create_symbol_table();
 }

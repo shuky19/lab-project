@@ -18,8 +18,7 @@ void write_object_file(char *file_name, instructions_counter *ic, data_counter *
 	FILE *obj_file = recreate_file(file_name, "obj");
 
 	/* Writing header */
-	fprintf(obj_file, "%d %d",ic->word_counter, dc->word_counter);
-
+	fprintf(obj_file, "%d %d\n",ic->word_counter, dc->word_counter);
 	int i;
 
 	for (i = 0; i < ic->index; ++i)
@@ -63,15 +62,16 @@ void write_command(FILE *file, command *comm)
 	// Write octal representation of the command
 	int i;
 	unsigned int command_content;
+	command_content = 0;
 	memcpy(&command_content,comm, WORD_LENGTH);
-	fprintf(file, "%d %c",cast_decimal_to_octal(command_content), 'a');
+	fprintf(file, "%d %c\n",cast_decimal_to_octal(command_content), 'a');
 
 	/* Write all data content */
 	for (i = 0; i < comm->extra_word_count; ++i)
 	{
 		int extra_word = cast_decimal_to_octal(comm->extra_words[i]);
 		char extra_word_type = comm->extra_words_type[i];
-		fprintf(file, "%d %c", extra_word, extra_word_type);
+		fprintf(file, "%d %c\n", extra_word, extra_word_type);
 	}
 }
 
@@ -86,7 +86,7 @@ void write_data(FILE *file, instruction_line *instruc)
 	/* Write all data content */
 	for (i = 0; i < instruc->content_length; ++i)
 	{
-		fprintf(file, "%d",cast_decimal_to_octal(instruc->content.data[i]));
+		fprintf(file, "%d\n",cast_decimal_to_octal(instruc->content.data[i]));
 	}
 }
 
@@ -95,7 +95,7 @@ void write_data(FILE *file, instruction_line *instruc)
 */
 void write_symbol(FILE *file, symbol *sym)
 {
-	fprintf(file, "%s %d",sym->name, sym->address);
+	fprintf(file, "%s %d\n",sym->name, sym->address);
 }
 
 /*

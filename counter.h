@@ -9,7 +9,8 @@
 #include "structure.h"
 #include <string.h>
 #include <stdlib.h>
-#define MAX_TABLE_LENGTH 1000
+#include <stdio.h>
+#define MAX_TABLE_LENGTH 100
 #define MAX_SYMBOL_LENGTH 50
 
 /*
@@ -19,7 +20,7 @@ typedef struct
 {
 	int word_counter; /* Represent the amount of word taken in the table */
 	int index; /* Represent the index of the next instruction in table */
-	command_ptr instructions[MAX_TABLE_LENGTH];
+	command_ptr *instructions;
 } instructions_counter;
 
 /*
@@ -29,7 +30,7 @@ typedef struct
 {
 	int word_counter; /* Represent the amount of word taken in the table */
 	int index; /* Represent the index of the next data in table */
-	instruction_line_ptr data[MAX_TABLE_LENGTH];
+	instruction_line_ptr *data;
 } data_counter;
 
 typedef enum { COMMAND_TABLE, EXTERNAL_TABLE, DATA_TABLE, ENTRY_TABLE } symbol_source;
@@ -52,7 +53,7 @@ typedef symbol *symbol_ptr;
 typedef struct
 {
 	int counter;
-	symbol_ptr symbols[MAX_TABLE_LENGTH];
+	symbol_ptr *symbols;
 } symbols_table;
 
 /*
@@ -74,4 +75,34 @@ void add_data(data_counter *dc, instruction_line_ptr data);
 ** add new symbol to the given instruction counter
 */
 void add_instruction(instructions_counter *ic, command *comm);
+
+/*
+** Create and intialize symbol table
+*/
+symbols_table *create_symbol_table();
+
+/*
+** Free symbol table from memory
+*/
+void free_symbol_table(symbols_table *sym_table);
+
+/*
+** Create and intialize instruction counter
+*/
+instructions_counter *create_instruction_counter();
+
+/*
+** Free instruction counter from memory
+*/
+void free_instruction_counter(instructions_counter *ic);
+
+/*
+** Create and intialize instruction counter
+*/
+data_counter *create_data_counter();
+
+/*
+** Free data counter from memory
+*/
+void free_data_counter(data_counter *ic);
 #endif

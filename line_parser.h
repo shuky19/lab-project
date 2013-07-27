@@ -24,7 +24,7 @@ line_type get_line_type(char *line);
 /*
 ** Create a command line from the given string
 */
-command_line get_command_line(char *line);
+command_line *get_command_line(char *line);
 
 /*
 ** Create an instruction line from the given string
@@ -34,7 +34,7 @@ instruction_line get_instruction_line(char *line);
 /*
 ** Create a command from the given command_line
 */
-command get_command(command_line *comm_line);
+command *get_command(command_line *comm_line);
 
 /*
 ** Assign symbol address to the command

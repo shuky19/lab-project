@@ -20,16 +20,15 @@ typedef enum { COMMAND, INSTRUCTION, COMMENT, BLANK } line_type;
 */
 typedef struct
 {
-	unsigned int comb : 2;
-	unsigned int dest_reg : 3;
-	unsigned int dest_add : 2;
-	unsigned int source_reg : 2;
-	unsigned int source_add : 2;
-	unsigned int opcode : 3;
-	unsigned int type : 1;
-	unsigned int dbl : 1;
-	unsigned int : 2;
-	unsigned int extra_words[4]; /* Represent words for addressing */
+	unsigned comb : 2;
+	unsigned dest_reg : 3;
+	unsigned dest_add : 2;
+	unsigned source_reg : 2;
+	unsigned source_add : 2;
+	unsigned opcode : 3;
+	unsigned type : 1;
+	unsigned dbl : 1;
+	unsigned extra_words[4]; /* Represent words for addressing */
 	unsigned char extra_words_type[4]; /* Represent words type ('a', 'r', 'e') */
 	int extra_word_count; /* Describes the amount of word needed for addressing */
 	char *symbols_names[2]; /* Save the symbol index in the label_table */
@@ -94,5 +93,4 @@ command_line make_command_line(char *label, char *command, char *firstop, char *
 ** Create instruction line from the given arguments
 */
 instruction_line make_instruction_line(char *label, char *command, char *arguemtns[]);
-
 #endif

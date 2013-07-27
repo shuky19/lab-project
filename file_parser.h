@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#define MAX_LINE 80
+#define MAX_LINE_LENGTH 80
 #define MAX_EXTRIES_IN_FILE 80
 
 /*
@@ -59,3 +59,8 @@ void fix_entry_symbol_table();
 ** Handle an external reference inside a command line
 */
 void handle_external_reference(char *symbol_name, int line_address, command *comm);
+
+/**
+** Initialize all tables and counters
+*/
+void initialize();

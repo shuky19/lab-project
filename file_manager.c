@@ -5,7 +5,10 @@
 */
 FILE *recreate_file(char *file_name, char *extension)
 {
-	return fopen(file_name, "w");
+	char full_name[strlen(file_name) + strlen(extension)+1];
+	get_full_file_name(full_name, file_name, extension);
+	FILE *file = fopen(full_name, "w");
+	return file;
 }
 
 /*
@@ -13,7 +16,10 @@ FILE *recreate_file(char *file_name, char *extension)
 */
 FILE *open_file(char *file_name, char *extension)
 {
-	return fopen(file_name, "r");
+	char full_name[strlen(file_name) + strlen(extension)+1];
+	get_full_file_name(full_name, file_name, extension);
+	FILE *file = fopen(full_name, "r");
+	return file;
 }
 
 /*
@@ -22,4 +28,14 @@ FILE *open_file(char *file_name, char *extension)
 void close_file(FILE *file)
 {
 	fclose(file);
+}
+
+/*
+** Concate file_name with extenstion into dest
+*/
+void get_full_file_name(char *dest, char *file_name, char *extension)
+{
+	strcpy(dest, file_name);
+	strcat(dest, ".");
+	strcat(dest, extension);
 }

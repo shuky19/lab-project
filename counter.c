@@ -26,7 +26,7 @@ int get_symbol_address(symbols_table *table, char *symbol_name)
 */
 void add_symbol(symbols_table *table, char *name, int address, symbol_source source)
 {
-	symbol *sym;
+	symbol *sym = (symbol *)malloc(sizeof(symbol));
 	sym->name = name;
 	sym->address = address;
 	sym->source = source;
@@ -58,4 +58,72 @@ void add_instruction(instructions_counter *ic, command *comm)
 	/* Incerement counter acoutrding to the command size
 	   One word for the command + one for each extra word needed */
 	ic->word_counter += comm->extra_word_count + 1;
+}
+
+/*
+** Create and intialize symbol table
+*/
+symbols_table *create_symbol_table()
+{
+	symbols_table *sym_table = (symbols_table *)malloc(sizeof(symbols_table));
+	sym_table->symbols = (symbol **)calloc(MAX_TABLE_LENGTH, sizeof(symbol *));	
+	sym_table->counter = 0;
+}
+
+/*
+** Free symbol table from memory
+*/
+void free_symbol_table(symbols_table *sym_table)
+{
+	int i;
+
+	for (i = 0; i < sym_table->counter; ++i)
+	{
+		free(sym_table->symbols[i]->name);
+		free(sym_table->symbols[i]);
+	}
+
+	free(sym_table->symbols);
+	free(sym_table);
+}
+
+/*
+** Create and intialize instruction counter
+*/
+instructions_counter *create_instruction_counter()
+{
+	instructions_counter *ic = (instructions_counter *)malloc(sizeof(instructions_counter));
+	ic->instructions = (command **)calloc(MAX_TABLE_LENGTH, sizeof(command *));
+	ic->index = 0;
+	ic->word_counter = 0;
+
+	return ic;
+}
+
+/*
+** Free instruction counter from memory
+*/
+void free_instruction_counter(instructions_counter *ic)
+{
+}
+
+/*
+** Create and intialize instruction counter
+*/
+data_counter *create_data_counter()
+{
+	data_counter *dc = (data_counter *)malloc(sizeof(data_counter));
+	dc->data = (instruction_line **)calloc(MAX_TABLE_LENGTH, sizeof(instruction_line *));
+	dc->index = 0;
+	dc->word_counter = 0;
+
+	return dc;
+}
+
+/*
+** Free data counter from memory
+*/
+void free_data_counter(data_counter *ic)
+{
+
 }
