@@ -1,7 +1,5 @@
 #include "file_parser.h"
-
-// #include "line_parser.h"
-#include "line_parser.c"
+#include "line_parser.h"
 
 struct instructions_counter *ic;
 struct data_counter *dc;

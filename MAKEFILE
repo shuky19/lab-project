@@ -1,0 +1,2 @@
+all:
+	gcc assembler.h assembler.c counter.h counter.c file_parser.h file_parser.c line_parser.h line_parser.c string_helper.h string_helper.c structure.h structure.c -o assembler

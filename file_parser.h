@@ -4,7 +4,7 @@
 */
 
 #include "stdio.h"
-#include "counter.c"
+#include "counter.h"
 #include "stdlib.h"
 
 /*

@@ -8,8 +8,8 @@ file_parser.h - Responsible on compiling one file.
 
 line_parser.h - Responsible on compiling one line in the file.
 
-structure.h - Responsible on managing all needed types for
-			  acourding to the פרםחקבא characterization.
+structure.h - Responsible on managing all needed types for compiling
+			  according to the project characterization.
 
 counter.h - Responsible on managing all counters and static data
 			needed for one file compilation.
