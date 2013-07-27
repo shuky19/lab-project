@@ -6,7 +6,6 @@
 #include "structure.h"
 #include "file_manager.h"
 #include <stdio.h>
-#define WORD_LENGTH 2
 
 /*
 ** Write output files (Object file, Entry file, External file)

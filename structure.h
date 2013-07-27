@@ -5,6 +5,7 @@
 
 #ifndef STRUCTURE
 #define STRUCTURE value
+#define WORD_LENGTH 2
 
 /*
 ** Represnt a type of line in the source file

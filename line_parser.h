@@ -9,6 +9,7 @@
 #include "counter.h"
 #include "structure.h"
 #include <stdio.h>
+#define MAX_LINE_LENGTH 80
 
 /*
 ** Get next line in the file

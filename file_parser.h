@@ -9,7 +9,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#define MAX_LINE_LENGTH 80
 #define MAX_EXTRIES_IN_FILE 80
 
 /*
