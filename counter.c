@@ -68,6 +68,7 @@ symbols_table *create_symbol_table()
 	symbols_table *sym_table = (symbols_table *)malloc(sizeof(symbols_table));
 	sym_table->symbols = (symbol **)calloc(MAX_TABLE_LENGTH, sizeof(symbol *));	
 	sym_table->counter = 0;
+	return sym_table;
 }
 
 /*

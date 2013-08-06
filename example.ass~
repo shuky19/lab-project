@@ -1,3 +1,4 @@
+STRADD: .data 0
 ; this is a comment 
 .entry  STRADD
   .entry MAIN

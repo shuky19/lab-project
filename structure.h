@@ -17,23 +17,38 @@
 typedef enum { COMMAND, INSTRUCTION, COMMENT, BLANK } line_type;
 
 /*
+** Structural representation of an extra word in a command
+** for label: use label_name
+** for a constant number: use number
+*/
+typedef union
+{
+	int number;
+	char *label_name;
+} command_extra_words;
+
+/*
 ** Binary representation a compiled line
 */
 typedef struct
 {
 	unsigned comb : 2;
 	unsigned dest_reg : 3;
-	unsigned dest_add : 2;
-	unsigned source_reg : 2;
-	unsigned source_add : 2;
-	unsigned opcode : 3;
+	unsigned dest_miun : 2;
+	unsigned source_reg : 3;
+	unsigned source_miun : 2;
+	unsigned opcode : 4;
 	unsigned type : 1;
 	unsigned dbl : 1;
-	unsigned extra_words[4]; /* Represent words for addressing */
+	/*unsigned extra_words[4]; /* Represent words for addressing */
 	unsigned char extra_words_type[4]; /* Represent words type ('a', 'r', 'e') */
-	int extra_word_count; /* Describes the amount of word needed for addressing */
-	char *symbols_names[2]; /* Save the symbol index in the label_table */
+	/*int extra_word_count; /* Describes the amount of word needed for addressing */
+	/*char *symbols_names[2]; /* Save the symbol index in the label_table
 	int symbols_count;/* Describes the amount of symbols needed for addressing */
+
+	command_extra_words extra_words[4];
+	int extra_word_count;
+
 	int address; /* Represent the starting address of this command */
 } command;
 
@@ -46,20 +61,21 @@ typedef struct
 {
 	char *label;
 	char *command;
+	int dbl;
 	char *firstop;
 	char *secondop;
 } command_line;
 
 /*
-** Structural representation of indtruction content
+** Structural representation of instruction content
 ** for entry: use symbol_name
-** for exterb: use symbol_name
+** for extern: use symbol_name
 ** for data: use data
 ** for string: use strings
 */
 typedef union
 {
-	unsigned int *data;
+	int *data;
 	char *symbol_name;
 } instruction_content;
 
