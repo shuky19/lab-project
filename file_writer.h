@@ -46,3 +46,8 @@ void write_external(FILE *file, symbol *sym);
 ** Cast unsigned int to octal representation and write it as a line
 */
 int cast_decimal_to_octal(unsigned int data);
+
+/*
+** Print octal numbers with '0's before to complete 8 digits
+*/
+void print_octal(FILE *file, int octal);

@@ -53,6 +53,10 @@ command_line *get_command_line(char *line)
 		cl->label[labelLength - 1] = '\0';
 		commandIndex = 1;
 	}
+	else
+	{
+		cl->label = NULL;
+	}
 
 	cl->command = (char*) calloc(strlen(lineParts[commandIndex]) + 1, sizeof(char));
 	strcpy(cl->command, lineParts[commandIndex]);
@@ -78,40 +82,44 @@ command_line *get_command_line(char *line)
 	return cl;
 }
 
-instruction_line get_instruction_line(char *line)
+instruction_line *get_instruction_line(char *line)
 {
-	instruction_line il;
+	instruction_line* il = (instruction_line*)malloc(sizeof(instruction_line));
 	char** lineParts = get_all_parts(line, 20, ", \t");
 	int instructionIndex = 0, labelLength;
 
 	if (is_label(lineParts[0]))
 	{
 		labelLength = strlen(lineParts[0]);
-		il.label = (char*) calloc(labelLength, sizeof(char));
-		strncpy(il.label, lineParts[0], labelLength - 1);
-		il.label[labelLength - 1] = '\0';
+		il->label = (char*) calloc(labelLength, sizeof(char));
+		strncpy(il->label, lineParts[0], labelLength - 1);
+		il->label[labelLength - 1] = '\0';
 		instructionIndex = 1;
+	}
+	else
+	{
+		il->label = NULL;
 	}
 
 	if (strcmp(lineParts[instructionIndex], ".data") == 0)
 	{
-		il.command = DATA;
-		fill_data_instruction(&il, lineParts, instructionIndex + 1);
+		il->command = DATA;
+		fill_data_instruction(il, lineParts, instructionIndex + 1);
 	}
 	else if (strcmp(lineParts[instructionIndex], ".string") == 0)
 	{
-		il.command = STRING;
-		fill_string_instruction(&il, lineParts, instructionIndex + 1);
+		il->command = STRING;
+		fill_string_instruction(il, lineParts, instructionIndex + 1);
 	}
 	else if (strcmp(lineParts[instructionIndex], ".entry") == 0)
 	{
-		il.command = ENTRY;
-		fill_extern_entry_instruction(&il, lineParts, instructionIndex + 1);
+		il->command = ENTRY;
+		fill_extern_entry_instruction(il, lineParts, instructionIndex + 1);
 	}
 	else if (strcmp(lineParts[instructionIndex], ".extern") == 0)
 	{
-		il.command = EXTERN;
-		fill_extern_entry_instruction(&il, lineParts, instructionIndex + 1);
+		il->command = EXTERN;
+		fill_extern_entry_instruction(il, lineParts, instructionIndex + 1);
 	}
 	else
 	{
@@ -556,7 +564,7 @@ void verify_dest_operand(char* operandString, command *comm)
  */
 void assign_symbol_adderss(command *comm, int symbol_index, int symbol_address)
 {
-	printf("Should not happend\n");
+	comm->extra_words[symbol_index].number = symbol_address;
 }
 
 /*

@@ -111,10 +111,9 @@ void handle_command(char *line) {
 	/* If this line contains symbols
 	 add them to sym_table */
 	if (comm_line->label != NULL) {
-		add_symbol(sym_table, comm_line->label, ic->word_counter,
-				COMMAND_TABLE);
+		add_symbol(sym_table, comm_line->label, ic->word_counter, COMMAND_TABLE);
 	}
-
+	
 	/* Add the instruction to the intruction counter */
 	add_instruction(ic, comm);
 }
@@ -124,28 +123,23 @@ void handle_command(char *line) {
  */
 void handle_instruction(char *line) {
 	/* Get parsed instruction */
-	instruction_line inst_line = get_instruction_line(line);
+	instruction_line *inst_line = get_instruction_line(line);
 
-	if (inst_line.command == DATA || inst_line.command == STRING) {
+	if (inst_line->command == DATA || inst_line->command == STRING) {
 		/* If this line contains symbols
 		 add them to sym_table */
-		if (inst_line.label != NULL) {
-			/* Temporsrly insert 0, because data section should start 
-			 after instruction section. this value will be overided
-			 later */
-			add_symbol(sym_table, inst_line.label, 0, DATA_TABLE);
-
+		if (inst_line->label != NULL) {
+			add_symbol(sym_table, inst_line->label, dc->word_counter, DATA_TABLE);
 		}
 
 		/* Add the instruction to the instruction counter */
-		add_data(dc, &inst_line);
-	} else if (inst_line.command == EXTERN) {
+		add_data(dc, inst_line);
+	} else if (inst_line->command == EXTERN) {
 		/* Add external instruction to the external couter */
-		add_data(external_counter, &inst_line);
-	} else if (inst_line.command == ENTRY) {
+		add_data(external_counter, inst_line);
+	} else if (inst_line->command == ENTRY) {
 		/* Add to entry symbols table with no address */
-		add_symbol(entry_sym_table, inst_line.content.symbol_name, 0,
-				ENTRY_TABLE);
+		add_symbol(entry_sym_table, inst_line->content.symbol_name, 0, ENTRY_TABLE);
 	} else {
 		printf("Unknow instruction type\n");
 		exit(1);
@@ -162,7 +156,7 @@ void fix_symbol_references() {
 	/* Run over all commands */
 	for (i = 0; i < ic->index; ++i) {
 		int j;
-		command *current_command = ic->instructions[0];
+		command *current_command = ic->instructions[i];
 
 		/* Run over all needed symbols */
 		for (j = 0; j < current_command->extra_word_count; ++j) {
@@ -170,13 +164,12 @@ void fix_symbol_references() {
 				char *symbol_name = current_command->extra_words[j].label_name;
 
 				/* Try find symbol in symbol table */
-				int address = get_symbol_address(sym_table, symbol_name);
+				int address = get_symbol_address(sym_table, symbol_name, ic->word_counter);
 
 				/* If symbol was not found */
 				if (address == -1) {
 					/* It's an external symbol reference */
-					handle_external_reference(symbol_name,
-							current_command->address, current_command);
+					handle_external_reference(symbol_name, current_command->address + j + 1);
 				} else {
 					assign_symbol_adderss(current_command, j, address);
 				}
@@ -195,15 +188,14 @@ void fix_entry_symbol_table() {
 	for (i = 0; i < entry_sym_table->counter; ++i) {
 		symbol *entry_symbol = entry_sym_table->symbols[i];
 		entry_symbol->address = get_symbol_address(sym_table,
-				entry_symbol->name);
+				entry_symbol->name, ic->word_counter);
 	}
 }
 
 /*
  ** Handle an external reference inside a command line
  */
-void handle_external_reference(char *symbol_name, int line_address,
-		command *comm) {
+void handle_external_reference(char *symbol_name, int line_address) {
 	int i;
 
 	/* Run over all entry symbols */
@@ -213,8 +205,7 @@ void handle_external_reference(char *symbol_name, int line_address,
 		/* If symbol found in this external symbol */
 		if (strncmp(symbol_name, external_symbol, MAX_SYMBOL_LENGTH) == 0) {
 			/* Add symbol to the external symbols table */
-			add_symbol(external_sym_table, symbol_name, comm->address,
-					EXTERNAL_TABLE);
+			add_symbol(external_sym_table, symbol_name, line_address, EXTERNAL_TABLE);
 			break;
 		}
 	}

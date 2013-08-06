@@ -12,6 +12,7 @@
 #include <stdio.h>
 #define MAX_TABLE_LENGTH 100
 #define MAX_SYMBOL_LENGTH 50
+#define START_ADDRESS 100
 
 /*
 ** Hold all the instruction in the compiled file
@@ -59,7 +60,7 @@ typedef struct
 /*
 ** Find the symbol's address
 */
-int get_symbol_address(symbols_table *table, char *symbol_name);
+int get_symbol_address(symbols_table *table, char *symbol_name, int data_start_address);
 
 /*
 ** add new symbol to the given symbol table

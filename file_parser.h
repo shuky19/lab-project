@@ -57,7 +57,7 @@ void fix_entry_symbol_table();
 /*
 ** Handle an external reference inside a command line
 */
-void handle_external_reference(char *symbol_name, int line_address, command *comm);
+void handle_external_reference(char *symbol_name, int line_address);
 
 /**
 ** Initialize all tables and counters

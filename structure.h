@@ -40,15 +40,9 @@ typedef struct
 	unsigned opcode : 4;
 	unsigned type : 1;
 	unsigned dbl : 1;
-	/*unsigned extra_words[4]; /* Represent words for addressing */
 	unsigned char extra_words_type[4]; /* Represent words type ('a', 'r', 'e') */
-	/*int extra_word_count; /* Describes the amount of word needed for addressing */
-	/*char *symbols_names[2]; /* Save the symbol index in the label_table
-	int symbols_count;/* Describes the amount of symbols needed for addressing */
-
 	command_extra_words extra_words[4];
 	int extra_word_count;
-
 	int address; /* Represent the starting address of this command */
 } command;
 

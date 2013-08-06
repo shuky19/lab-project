@@ -3,22 +3,30 @@
 /*
 ** Find the symbol's index
 */
-int get_symbol_address(symbols_table *table, char *symbol_name)
+int get_symbol_address(symbols_table *table, char *symbol_name, int data_start_address)
 {
 	int i;
-	int index = -1;
+	int address = -1;
 
 	for (i = 0; i < table->counter; ++i)
 	{
-		char *current_symbol_name = table->symbols[i]->name;
+		symbol* current_symbol = table->symbols[i];
+		char *current_symbol_name = current_symbol->name;
 		if(0 == strncmp(symbol_name, current_symbol_name, MAX_SYMBOL_LENGTH))
 		{
-			index = i;
-			break;
+			if(current_symbol->source == COMMAND_TABLE)
+			{
+				address = current_symbol->address;
+				break;
+			}
+			else if (current_symbol->source == DATA_TABLE)
+			{
+				address = current_symbol->address + data_start_address;
+			}
 		}
 	}
 
-	return index;
+	return address;
 }
 
 /*
@@ -41,9 +49,8 @@ void add_data(data_counter *dc, instruction_line_ptr data)
 	/* Add data to the data table */
 	dc->data[dc->index++] = data;
 
-	/* Incerement counter acoutrding to the command size
-	   One word for the command + one for each extra word needed */
-	dc->word_counter += data->content_length + 1;
+	/* Incerement counter acoutrding to the data size */
+	dc->word_counter += data->content_length;
 }
 
 /*
@@ -53,7 +60,7 @@ void add_instruction(instructions_counter *ic, command *comm)
 {
 	/* Add command to the instructions table */
 	ic->instructions[ic->index++] = comm;
-	comm->address = ic->index;
+	comm->address = ic->word_counter;
 
 	/* Incerement counter acoutrding to the command size
 	   One word for the command + one for each extra word needed */
@@ -96,7 +103,7 @@ instructions_counter *create_instruction_counter()
 	instructions_counter *ic = (instructions_counter *)malloc(sizeof(instructions_counter));
 	ic->instructions = (command **)calloc(MAX_TABLE_LENGTH, sizeof(command *));
 	ic->index = 0;
-	ic->word_counter = 0;
+	ic->word_counter = START_ADDRESS;
 
 	return ic;
 }

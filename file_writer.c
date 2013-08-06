@@ -20,7 +20,7 @@ void write_object_file(char *file_name, instructions_counter *ic,
 	FILE *obj_file = recreate_file(file_name, "obj");
 
 	/* Writing header */
-	fprintf(obj_file, "%d %d\n", ic->word_counter, dc->word_counter);
+	fprintf(obj_file, "%d %d\n", cast_decimal_to_octal(ic->word_counter-START_ADDRESS), cast_decimal_to_octal(dc->word_counter));
 
 	for (i = 0; i < ic->index; ++i) {
 		command *current_command = ic->instructions[i];
@@ -61,15 +61,15 @@ void write_command(FILE *file, command *comm) {
 	unsigned int command_content;
 	command_content = 0;
 	memcpy(&command_content, comm, WORD_LENGTH);
-	fprintf(file, "%d %c\n", cast_decimal_to_octal(command_content), 'a');
+	print_octal(file, cast_decimal_to_octal(command_content));
+	fprintf(file, " %c\n", 'a');
 
 	/* Write all data content */
 	for (i = 0; i < comm->extra_word_count; ++i) {
-		if (comm->extra_words_type[i] == 'a') {
-			int extra_word = cast_decimal_to_octal(comm->extra_words[i].number);
-			char extra_word_type = comm->extra_words_type[i];
-			fprintf(file, "%d %c\n", extra_word, extra_word_type);
-		}
+		int extra_word = cast_decimal_to_octal(comm->extra_words[i].number);
+		char extra_word_type = comm->extra_words_type[i];
+		print_octal(file, extra_word);
+		fprintf(file, "%d %c\n", extra_word, extra_word_type);
 	}
 }
 
@@ -81,7 +81,8 @@ void write_data(FILE *file, instruction_line *instruc) {
 
 	/* Write all data content */
 	for (i = 0; i < instruc->content_length; ++i) {
-		fprintf(file, "%d\n", cast_decimal_to_octal(instruc->content.data[i]));
+		print_octal(file, cast_decimal_to_octal(instruc->content.data[i]));
+		fprintf(file, "\n");
 	}
 }
 
@@ -89,7 +90,7 @@ void write_data(FILE *file, instruction_line *instruc) {
  ** Write a symbol to the file
  */
 void write_symbol(FILE *file, symbol *sym) {
-	fprintf(file, "%s %d\n", sym->name, sym->address);
+	fprintf(file, "%s %d\n", sym->name, cast_decimal_to_octal(sym->address));
 }
 
 /*
@@ -100,7 +101,7 @@ int cast_decimal_to_octal(unsigned int data) {
 	int octal = 0;
 
 	/* Get all digits in reverse */
-	while (data > 0) {
+		while (data > 0) {
 		digit = data % 8;
 		sum = sum * 10 + digit;
 		data = data / 8;
@@ -116,4 +117,21 @@ int cast_decimal_to_octal(unsigned int data) {
 	}
 
 	return octal;
+}
+
+/*
+** Print octal numbers with '0's before to complete 8 digits
+*/
+void print_octal(FILE *file, int octal)
+{
+	int i;
+	char buffer[7];
+	int length = sprintf(buffer, "%d", octal);
+
+	for (i=0; i<7-2; ++i)
+	{
+		fprintf(file, "%c", '0');
+	}
+
+	fprintf(file, "%u", octal);
 }
