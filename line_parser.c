@@ -80,6 +80,7 @@ command_line *get_command_line(char *line)
 	}
 	else
 	{
+		cl->firstop = NULL;
 		cl->secondop = (char*) calloc(strlen(lineParts[commandIndex + 2]) + 1, sizeof(char));
 		strcpy(cl->secondop, lineParts[commandIndex + 2]);
 	}

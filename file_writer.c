@@ -21,7 +21,6 @@ void write_object_file(char *file_name, instructions_counter *ic,
 
 	/* Writing header */
 	fprintf(obj_file, "%d %d\n", cast_decimal_to_octal(ic->word_counter-START_ADDRESS), cast_decimal_to_octal(dc->word_counter));
-	printf("ic: %d, dc: %d\n", ic->word_counter-START_ADDRESS, dc->word_counter);
 
 	for (i = 0; i < ic->index; ++i) {
 		command *current_command = ic->instructions[i];

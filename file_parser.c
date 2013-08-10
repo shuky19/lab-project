@@ -113,7 +113,7 @@ void handle_command(char *line) {
 	if (comm_line->label != NULL) {
 		add_symbol(sym_table, comm_line->label, ic->word_counter, COMMAND_TABLE);
 	}
-	
+
 	/* Add the instruction to the intruction counter */
 	add_instruction(ic, comm);
 }
@@ -188,7 +188,6 @@ void fix_symbol_references() {
 					/* It's an external symbol reference */
 					handle_external_reference(symbol_name, current_command->address + j + 1);
 					current_command->extra_words_type[j] = 'e';
-					current_command->extra_word_count = 1;
 					current_command->extra_words[j].number = 0;
 				} else {
 					assign_symbol_adderss(current_command, j, address);
