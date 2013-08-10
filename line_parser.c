@@ -215,6 +215,13 @@ command *get_command(command_line *comm_line, int *is_error)
 	fill_type_comb(comm_line->command, comm, is_error);
 	comm->dbl = comm_line->dbl;
 
+	/* if we found an error until now, we shouldn't check the operands (we don't know
+	 *  what the miun type can be), so we return the command we parsed until now.	 */
+	if (is_error)
+	{
+		return comm;
+	}
+
 	fill_operand(comm_line->firstop, comm, &miun, &reg);
 	comm->source_miun = miun;
 	comm->source_reg = reg;
