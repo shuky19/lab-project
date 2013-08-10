@@ -101,9 +101,6 @@ void handle_line(char *line) {
 	case BLANK:
 		/* Nothing to do here */
 		break;
-	default:
-		printf("Unknow line type\n");
-		break;
 	}
 }
 
