@@ -1,6 +1,8 @@
 #ifndef MEMORY
 #define MEMORY value
 #include <stddef.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 /*
 ** Allocating new array of given count and size

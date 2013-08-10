@@ -62,7 +62,7 @@ void parse_file(char *file_name) {
  */
 void first_round(FILE *file) {
 	char *line = (char *) calloc_with_validation(MAX_LINE_LENGTH, sizeof(char));
-	while (next_line(file, line, MAX_LINE_LENGTH, &is_error) != -1) {
+	while (next_line(file, line, MAX_LINE_LENGTH) != -1) {
 		handle_line(line);
 	}
 
@@ -90,7 +90,7 @@ void second_round() {
  ** Handle one line in the file
  */
 void handle_line(char *line) {
-	switch (get_line_type(line, &is_error)) {
+	switch (get_line_type(line)) {
 	case COMMAND:
 		handle_command(line);
 		break;
@@ -113,7 +113,7 @@ void handle_line(char *line) {
  */
 void handle_command(char *line) {
 	/* Get the parsed command */
-	command_line *comm_line = get_command_line(line, &is_error);
+	command_line *comm_line = get_command_line(line);
 
 	/* Compile the command (Symbols references are left with names) */
 	command *comm = get_command(comm_line, &is_error);
@@ -186,7 +186,7 @@ void fix_symbol_references() {
 					else
 					{
 						int last_address, current_address;
-						assign_symbol_adderss(current_command, j, address, &is_error);
+						assign_symbol_adderss(current_command, j, address);
 
 						current_command->extra_words_type[j] = 'a';
 						last_address = current_command->address;
@@ -200,7 +200,7 @@ void fix_symbol_references() {
 					current_command->extra_words_type[j] = 'e';
 					current_command->extra_words[j].number = 0;
 				} else {
-					assign_symbol_adderss(current_command, j, address, &is_error);
+					assign_symbol_adderss(current_command, j, address);
 				}
 			}
 		}

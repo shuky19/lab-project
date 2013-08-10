@@ -13,6 +13,8 @@ void *calloc_with_validation(int count, size_t size)
 		printf("Not enough memory, exiting...\n");
 		exit(1);
 	}
+
+	return result;
 }
 
 /*
@@ -28,4 +30,6 @@ void *malloc_with_validation(size_t size)
 		printf("Not enough memory, exiting...\n");
 		exit(1);
 	}
+
+	return result;
 }

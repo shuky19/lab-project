@@ -31,18 +31,18 @@
 /*
  ** Get next line in the file
  */
-int next_line(FILE *file, char *buffer, size_t len, int *is_error);
+int next_line(FILE *file, char *buffer, size_t len);
 
 /*
  ** Return what kind of line represented by
  ** the line parameter (COMMAND, INSTRUCTION, COMMENT, BLANK)
  */
-line_type get_line_type(char *line, int *is_error);
+line_type get_line_type(char *line);
 
 /*
  ** Create a command line from the given string
  */
-command_line *get_command_line(char *line, int *is_error);
+command_line *get_command_line(char *line);
 
 /*
  ** Create an instruction line from the given string
@@ -53,11 +53,6 @@ instruction_line *get_instruction_line(char *line, int *is_error);
  ** Create a command from the given command_line
  */
 command *get_command(command_line *comm_line, int *is_error);
-
-/*
- * checks if a given word is a label.
- */
-int is_label(char* word, int *is_error);
 
 /*
  * Fills the type bit and the comb bits by the command string.
@@ -72,47 +67,47 @@ void fill_opcpde(char* commandString, command* comm, int *is_error);
 /*
  * Fills a data instruction
  */
-void fill_data_instruction(instruction_line *line, char** lineParts, int firstDataIndex, int *is_error);
+void fill_data_instruction(instruction_line *line, char** lineParts, int firstDataIndex);
 
 /*
  * Fills an entry or an extern instruction
  */
-void fill_extern_entry_instruction(instruction_line *line, char** lineParts, int firstDataIndex, int *is_error);
+void fill_extern_entry_instruction(instruction_line *line, char** lineParts, int firstDataIndex);
 
 /*
  * Fills a string instruction
  */
-void fill_string_instruction(instruction_line *line, char** lineParts, int firstDataIndex, int *is_error);
+void fill_string_instruction(instruction_line *line, char** lineParts, int firstDataIndex);
 
 /*
  ** Assign symbol address to the command
  */
-void assign_symbol_adderss(command *comm, int symbol_index, int symbol_address, int *is_error);
+void assign_symbol_adderss(command *comm, int symbol_index, int symbol_address);
 
 /*
  * Fills an operand and its miun type
  */
-void fill_operand(char* operandString, command* comm, int* miun, int* reg, int *is_error);
+void fill_operand(char* operandString, command* comm, int* miun, int* reg);
 
 /*
  * fills an operand that uses mium miadi
  */
-void fill_miun_miadi(char* operandString, command* comm, int* miun, int *is_error);
+void fill_miun_miadi(char* operandString, command* comm, int* miun);
 
 /*
  * fills an operand that uses miun yashir
  */
-void fill_miun_yashir(char* operandString, command* comm, int* miun, int *is_error);
+void fill_miun_yashir(char* operandString, command* comm, int* miun);
 
 /*
  * fills an operand that uses miun-index-meguvan
  */
-void fill_miun_index_meguvan(char* operandString, command* comm, int* miun, int* reg, int *is_error);
+void fill_miun_index_meguvan(char* operandString, command* comm, int* miun, int* reg);
 
 /*
  * Gets a register number out of a string, or returns -1 if the strings doesn't represent any register
  */
-int get_reg_num(char* reg, int *is_error);
+int get_reg_num(char* reg);
 
 /*
  * Verifies there is no error in the source operand
@@ -123,4 +118,9 @@ void verify_source_operand(char* operandString, command *comm, int *is_error);
  * Verifies there is no error in the destination operand
  */
 void verify_dest_operand(char* operandString, command *comm, int *is_error);
+
+/*
+ * prints an error and sets the is_error flag to true
+ */
+void print_error(int *is_error, const char* error_msg);
 #endif

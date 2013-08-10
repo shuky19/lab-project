@@ -1,7 +1,7 @@
 #include "string_helper.h"
 
 /*
- ** Replace all concatanated spaces to one space
+ ** Replace all concatenated spaces to one space
  */
 void remove_double_spaces(char *line, int length) {
 	int i, j = 0;
@@ -38,13 +38,13 @@ char **get_all_parts(char *line, int max_parts, char *seperators) {
 	lineCopy = (char*) calloc_with_validation(strlen(line)+1, sizeof(char));
 	strcpy(lineCopy, line);
 
-	parts = calloc_with_validation(max_parts, sizeof(char *));
+	parts = (char**)calloc_with_validation(max_parts, sizeof(char *));
 	if (parts == NULL) {
 		/* TODO: ERROR: Not ENOUGH MEMORY */
 	}
 
 	for (j = 0; j < max_parts; ++j) {
-		parts[j] = calloc_with_validation(MAX_LINE_LENGTH, sizeof(char));
+		parts[j] = (char*)calloc_with_validation(MAX_LINE_LENGTH, sizeof(char));
 		if (parts[j] == NULL) {
 			/* TODO: ERROR: Not ENOUGH MEMORY */
 			printf("ERROR");
@@ -116,4 +116,16 @@ int is_numeric(char *str)
 	}
 
 	return 1;
+}
+
+/*
+ * checks if a given word is a label.
+ */
+int is_label(char* word)
+{
+	int length = strlen(word);
+	if (word[length - 1] == ':')
+		return 1;
+
+	return 0;
 }

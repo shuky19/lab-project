@@ -37,18 +37,22 @@ line_type get_line_type(char *line)
 	return COMMAND;
 }
 
+/*
+ ** Create a command line from the given string
+ */
 command_line *get_command_line(char *line)
 {
-	command_line *cl = (command_line *) malloc(sizeof(command_line));
+	command_line *cl = (command_line *) malloc_with_validation(sizeof(command_line));
 	/*we will try to get 5 parts: label (if exists), the command, the dbl, the first operand
 	 * and the second operand.*/
 	char** lineParts = get_all_parts(line, 5, ", \t");
 	int commandIndex = 0, labelLength;
 
+	/* set the label (if exists) */
 	if (is_label(lineParts[0]))
 	{
 		labelLength = strlen(lineParts[0]);
-		cl->label = (char*) calloc(labelLength, sizeof(char));
+		cl->label = (char*) calloc_with_validation(labelLength, sizeof(char));
 		strncpy(cl->label, lineParts[0], labelLength - 1);
 		cl->label[labelLength - 1] = '\0';
 		commandIndex = 1;
@@ -58,9 +62,11 @@ command_line *get_command_line(char *line)
 		cl->label = NULL;
 	}
 
-	cl->command = (char*) calloc(strlen(lineParts[commandIndex]) + 1, sizeof(char));
+	/* set the command */
+	cl->command = (char*) calloc_with_validation(strlen(lineParts[commandIndex]) + 1, sizeof(char));
 	strcpy(cl->command, lineParts[commandIndex]);
 
+	/* set the dbl */
 	if (strcmp("0", lineParts[commandIndex + 1]) == 0)
 	{
 		cl->dbl = 0;
@@ -70,18 +76,19 @@ command_line *get_command_line(char *line)
 		cl->dbl = 1;
 	}
 
-	/* If there is only one operand fill the secondOp and leave the firstOp null */
+	/* If there is only one operand - we fill the secondOp and leave the firstOp null. If there
+	 *  are two operands, we fill both the first and the second operand. */
 	if (strlen(lineParts[commandIndex+3]))
 	{
-		cl->firstop = (char*) calloc(strlen(lineParts[commandIndex + 2]) + 1, sizeof(char));
+		cl->firstop = (char*) calloc_with_validation(strlen(lineParts[commandIndex + 2]) + 1, sizeof(char));
 		strcpy(cl->firstop, lineParts[commandIndex + 2]);
-		cl->secondop = (char*) calloc(strlen(lineParts[commandIndex + 3]) + 1, sizeof(char));
+		cl->secondop = (char*) calloc_with_validation(strlen(lineParts[commandIndex + 3]) + 1, sizeof(char));
 		strcpy(cl->secondop, lineParts[commandIndex + 3]);
 	}
 	else
 	{
 		cl->firstop = NULL;
-		cl->secondop = (char*) calloc(strlen(lineParts[commandIndex + 2]) + 1, sizeof(char));
+		cl->secondop = (char*) calloc_with_validation(strlen(lineParts[commandIndex + 2]) + 1, sizeof(char));
 		strcpy(cl->secondop, lineParts[commandIndex + 2]);
 	}
 
@@ -89,16 +96,22 @@ command_line *get_command_line(char *line)
 	return cl;
 }
 
-instruction_line *get_instruction_line(char *line)
+/*
+ ** Create an instruction line from the given string
+ */
+instruction_line *get_instruction_line(char *line, int *is_error)
 {
-	instruction_line* il = (instruction_line*)malloc(sizeof(instruction_line));
+	instruction_line* il = (instruction_line*)malloc_with_validation(sizeof(instruction_line));
+	/* we try to get at most 20 parts - there might be a lot of arguments if its a
+	 * data instruction. */
 	char** lineParts = get_all_parts(line, 20, ", \t");
 	int instructionIndex = 0, labelLength;
 
+	/* set the label (if exists) */
 	if (is_label(lineParts[0]))
 	{
 		labelLength = strlen(lineParts[0]);
-		il->label = (char*) calloc(labelLength, sizeof(char));
+		il->label = (char*) calloc_with_validation(labelLength, sizeof(char));
 		strncpy(il->label, lineParts[0], labelLength - 1);
 		il->label[labelLength - 1] = '\0';
 		instructionIndex = 1;
@@ -108,6 +121,7 @@ instruction_line *get_instruction_line(char *line)
 		il->label = NULL;
 	}
 
+	/* set the instruction */
 	if (strcmp(lineParts[instructionIndex], ".data") == 0)
 	{
 		il->command = DATA;
@@ -130,7 +144,7 @@ instruction_line *get_instruction_line(char *line)
 	}
 	else
 	{
-		/* TODO: ERROR: UNKNOWN INSTRUCTION TYPE */
+		print_error(is_error, "Unknown instruction type");
 	}
 
 	free_line_parts(lineParts, 20);
@@ -149,7 +163,8 @@ void fill_data_instruction(instruction_line *line, char** lineParts, int firstDa
 	{
 	}
 
-	line->content.data = (int*) calloc((lastDataIndex - firstDataIndex), sizeof(int));
+	/* then we will set the values from the given string to the struct we build */
+	line->content.data = (int*) calloc_with_validation((lastDataIndex - firstDataIndex), sizeof(int));
 	for (i = firstDataIndex; i < lastDataIndex; ++i)
 	{
 		sscanf(lineParts[i], "%d", &(line->content.data[i - firstDataIndex]));
@@ -162,12 +177,11 @@ void fill_data_instruction(instruction_line *line, char** lineParts, int firstDa
  */
 void fill_string_instruction(instruction_line *line, char** lineParts, int firstDataIndex)
 {
-
 	int i;
 	/* we subtract 1 from the length of the word because there are two additional quotation marks we
-	 * don't need, but we add a '0' char to	mark the end of the string */
+	 * don't need, but we add a 0  char to	mark the end of the string */
 	int dataLength = strlen(lineParts[firstDataIndex]) - 1;
-	line->content.data = (int*) calloc(dataLength, sizeof(int));
+	line->content.data = (int*) calloc_with_validation(dataLength, sizeof(int));
 	for (i = 1; i < dataLength; ++i)
 	{
 		line->content.data[i - 1] = lineParts[firstDataIndex][i];
@@ -182,7 +196,7 @@ void fill_string_instruction(instruction_line *line, char** lineParts, int first
 void fill_extern_entry_instruction(instruction_line *line, char** lineParts, int firstDataIndex)
 {
 	int dataLength = strlen(lineParts[firstDataIndex]) + 1;
-	line->content.symbol_name = (char*) calloc(dataLength, sizeof(char));
+	line->content.symbol_name = (char*) calloc_with_validation(dataLength, sizeof(char));
 	strcpy(line->content.symbol_name, lineParts[firstDataIndex]);
 	line->content_length = dataLength;
 }
@@ -190,26 +204,26 @@ void fill_extern_entry_instruction(instruction_line *line, char** lineParts, int
 /*
  ** Create a command from the given command_line
  */
-command *get_command(command_line *comm_line)
+command *get_command(command_line *comm_line, int *is_error)
 {
 	int miun, reg;
-	command *comm = (command *) calloc(1, sizeof(command));
+	command *comm = (command *) calloc_with_validation(1, sizeof(command));
 
 	comm->extra_word_count = 0;
 
-	fill_opcpde(comm_line->command, comm);
-	fill_type_comb(comm_line->command, comm);
+	fill_opcpde(comm_line->command, comm, is_error);
+	fill_type_comb(comm_line->command, comm, is_error);
 	comm->dbl = comm_line->dbl;
 
 	fill_operand(comm_line->firstop, comm, &miun, &reg);
 	comm->source_miun = miun;
 	comm->source_reg = reg;
-	verify_source_operand(comm_line->firstop, comm);
+	verify_source_operand(comm_line->firstop, comm, is_error);
 
 	fill_operand(comm_line->secondop, comm, &miun, &reg);
 	comm->dest_miun = miun;
 	comm->dest_reg = reg;
-	verify_dest_operand(comm_line->firstop, comm);
+	verify_dest_operand(comm_line->firstop, comm, is_error);
 
 	return comm;
 }
@@ -217,7 +231,7 @@ command *get_command(command_line *comm_line)
 /*
  * Fills the type bit and the comb bits by the command string.
  */
-void fill_type_comb(char* commandString, command* comm)
+void fill_type_comb(char* commandString, command* comm, int *is_error)
 {
 	/* we will get the parts in the command, separated by the char '/'. The maximum number
 	 *  of parts will be 4. */
@@ -229,7 +243,7 @@ void fill_type_comb(char* commandString, command* comm)
 	{
 		comm->type = 0;
 	}
-	else
+	else if (commandParts[1][0] == '1')
 	{
 		/* If the type bit is 1, we have to set the comb bits too */
 		comm->type = 1;
@@ -237,6 +251,11 @@ void fill_type_comb(char* commandString, command* comm)
 		comb = (commandParts[2][0] == '1') << 1;
 		comb += commandParts[3][0] == '1';
 	}
+	else
+	{
+		print_error(is_error, "Unknown command type (neither 0 nor 1)");
+	}
+
 
 	comm->comb = comb;
 	free_line_parts(commandParts, 4);
@@ -245,12 +264,13 @@ void fill_type_comb(char* commandString, command* comm)
 /*
  * Fills the op code bits by the command string
  */
-void fill_opcpde(char* commandString, command* comm)
+void fill_opcpde(char* commandString, command* comm, int *is_error)
 {
 	/* we will get the first part only, which will be the command. */
 	char** commandParts = get_all_parts(commandString, 1, "/");
 	char* commandName = commandParts[0];
 
+	/* set the command */
 	if (strcmp(commandName, "mov") == 0)
 	{
 		comm->opcode = MOV;
@@ -317,7 +337,7 @@ void fill_opcpde(char* commandString, command* comm)
 	}
 	else
 	{
-		/*TODO: ERROR UNKNOW COMMAND */
+		print_error(is_error, "Unknown command");
 	}
 
 	free_line_parts(commandParts, 1);
@@ -339,7 +359,7 @@ void fill_operand(char* operandString, command* comm, int* miun, int* reg)
 		return;
 	}
 
-	operandStringCopy = (char*) calloc(strlen(operandString) + 1, sizeof(char));
+	operandStringCopy = (char*) calloc_with_validation(strlen(operandString) + 1, sizeof(char));
 	strcpy(operandStringCopy, operandString);
 
 	*reg = 0;
@@ -396,7 +416,7 @@ void fill_miun_yashir(char* operandString, command* comm, int* miun)
 	int extra_word_count = comm->extra_word_count++;
 	*miun = 1;
 	labelLength = strlen(operandString) + 1;
-	comm->extra_words[extra_word_count].label_name = (char*) calloc(labelLength, sizeof(char));
+	comm->extra_words[extra_word_count].label_name = (char*) calloc_with_validation(labelLength, sizeof(char));
 	strcpy(comm->extra_words[extra_word_count].label_name, operandString);
 	comm->extra_words_type[extra_word_count] = 'r';
 }
@@ -414,7 +434,7 @@ void fill_miun_index_meguvan(char* operandString, command* comm, int* miun, int*
 	/* set the first extra word (which is a label name) */
 	label = strtok(operandString, "{}*");
 	labelLength = strlen(label) + 1;
-	comm->extra_words[extra_word_count].label_name = (char*) calloc(labelLength, sizeof(char));
+	comm->extra_words[extra_word_count].label_name = (char*) calloc_with_validation(labelLength, sizeof(char));
 	strcpy(comm->extra_words[extra_word_count].label_name, label);
 	comm->extra_words[extra_word_count].label_name[labelLength - 1] = '\0';
 	comm->extra_words_type[extra_word_count] = 'r';
@@ -422,6 +442,7 @@ void fill_miun_index_meguvan(char* operandString, command* comm, int* miun, int*
 	/* set the second extra word (which might be a register, a label or a number) */
 	label = strtok(NULL, "{}*");
 	reg_num = get_reg_num(label);
+	/* if we found a register - then the second extra word is a register */
 	if (reg_num != -1)
 	{
 		*reg = reg_num;
@@ -435,12 +456,11 @@ void fill_miun_index_meguvan(char* operandString, command* comm, int* miun, int*
 		comm->extra_words[extra_word_count].number = constant;
 		comm->extra_words_type[extra_word_count] = 'a';
 	}
-	else
+	else  /* it means the second word is a label */
 	{
-		/* it means the second word is a label */
 		extra_word_count = comm->extra_word_count++;
 		labelLength = strlen(label) + 1;
-		comm->extra_words[extra_word_count].label_name = (char*) calloc(labelLength, sizeof(char));
+		comm->extra_words[extra_word_count].label_name = (char*) calloc_with_validation(labelLength, sizeof(char));
 		strcpy(comm->extra_words[extra_word_count].label_name, label);
 		comm->extra_words[extra_word_count].label_name[labelLength - 1] = '\0';
 		comm->extra_words_type[extra_word_count] = 'd';
@@ -482,7 +502,7 @@ int get_reg_num(char* reg)
 /*
  * Verifies there is no error in the source operand
  */
-void verify_source_operand(char* operandString, command *comm)
+void verify_source_operand(char* operandString, command *comm, int *is_error)
 {
 	int operandDoesntExist = operandString == NULL || strlen(operandString) == 0;
 	switch (comm->opcode)
@@ -492,16 +512,19 @@ void verify_source_operand(char* operandString, command *comm)
 	case ADD:
 	case SUB:
 		if (operandDoesntExist)
-		{/* TODO: error - wrong number of operands */
+		{
+			print_error(is_error, "Wrong number of operands");
 		}
 		break;
 	case LEA:
 		if (operandDoesntExist)
-		{/* TODO: error - wrong number of operands */
+		{
+			print_error(is_error, "Wrong number of operands");
 		}
 
 		else if (comm->source_miun == 0)
-		{/* TODO: error - the miun type doesn't can't be used with this operand */
+		{
+			print_error(is_error, "The miun type doesn't can't be used with the command");
 		}
 		break;
 	case NOT:
@@ -516,7 +539,8 @@ void verify_source_operand(char* operandString, command *comm)
 	case RTS:
 	case STOP:
 		if (operandDoesntExist != 0)
-		{/* TODO: error - error - wrong number of operands */
+		{
+			print_error(is_error, "Wrong number of operands");
 		}
 		break;
 	}
@@ -525,7 +549,7 @@ void verify_source_operand(char* operandString, command *comm)
 /*
  * Verifies there is no error in the destination operand
  */
-void verify_dest_operand(char* operandString, command *comm)
+void verify_dest_operand(char* operandString, command *comm, int *is_error)
 {
 	int operandDoesntExist = operandString == NULL || strlen(operandString) == 0;
 	switch (comm->opcode)
@@ -541,21 +565,25 @@ void verify_dest_operand(char* operandString, command *comm)
 		case BNE:
 		case RED:
 			if (operandDoesntExist)
-			{/* TODO: error - wrong number of operands */
+			{
+				print_error(is_error, "Wrong number of operands");
 			}
 			else if (comm->source_miun == 0)
-			{/* TODO: error - the miun type doesn't can't be used with this operand */
+			{
+				print_error(is_error, "The miun type doesn't can't be used with the command");
 			}
 			break;
 		case CMP:
 		case PRN:
 			if (operandDoesntExist)
-			{/* TODO: error - wrong number of operands */
+			{
+				print_error(is_error, "Wrong number of operands");
 			}
 			break;
 		case JSR:
 			if (operandDoesntExist)
-			{/* TODO: error - wrong number of operands */
+			{
+				print_error(is_error, "Wrong number of operands");
 			}
 			else if (comm->source_miun != 1)
 			{/* TODO: error - the miun type doesn't can't be used with this operand */
@@ -564,7 +592,8 @@ void verify_dest_operand(char* operandString, command *comm)
 		case RTS:
 		case STOP:
 			if (operandDoesntExist != 0)
-			{/* TODO: error - error - wrong number of operands */
+			{
+				print_error(is_error, "Wrong number of operands");
 			}
 			break;
 	}
@@ -579,15 +608,14 @@ void assign_symbol_adderss(command *comm, int symbol_index, int symbol_address)
 }
 
 /*
- * checks if a given word is a label.
+ * prints an error and sets the is_error flag to true
  */
-int is_label(char* word)
+void print_error(int *is_error, const char* error_msg)
 {
-	int length = strlen(word);
-	if (word[length - 1] == ':')
-		return 1;
-
-	return 0;
+	/* print the error message */
+	printf("Error: %s.\n", error_msg);
+	/* set the error to be true */
+	(*is_error) = 1;
 }
 
 /*

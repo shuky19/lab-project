@@ -1,20 +1,21 @@
 /*
-** This helper file contians methods for parsing lines
+** This helper file contains methods for parsing lines
 */
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "memory_helper.h"
 
 #define MAX_LINE_LENGTH 200
 #define MAX_PARTS_IN_LINE 30
 
 /*
-** Replace all concatanated spaces to one space
+** Replace all concatenated spaces to one space
 */
 void remove_double_spaces(char *line, int length);
 
 /*
-** Split the line by seperators
+** Split the line by separators
 */
 char **get_all_parts(char *line, int max_parts, char *seperators);
 
@@ -38,3 +39,8 @@ void free_line_parts(char** lineParts, int length);
  * Returns if a char is numeric
  */
 int is_numeric(char *str);
+
+/*
+ * checks if a given word is a label.
+ */
+int is_label(char* word);
