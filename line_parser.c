@@ -61,22 +61,28 @@ command_line *get_command_line(char *line)
 	cl->command = (char*) calloc(strlen(lineParts[commandIndex]) + 1, sizeof(char));
 	strcpy(cl->command, lineParts[commandIndex]);
 
-	if (lineParts[commandIndex + 1] != NULL)
+	if (strcmp("0", lineParts[commandIndex + 1]) == 0)
 	{
-		if (strcmp("0", lineParts[commandIndex + 1]) == 0)
-		{
-			cl->dbl = 0;
-		}
-		else
-		{
-			cl->dbl = 1;
-		}
+		cl->dbl = 0;
+	}
+	else
+	{
+		cl->dbl = 1;
 	}
 
-	cl->firstop = (char*) calloc(strlen(lineParts[commandIndex + 2]) + 1, sizeof(char));
-	strcpy(cl->firstop, lineParts[commandIndex + 2]);
-	cl->secondop = (char*) calloc(strlen(lineParts[commandIndex + 3]) + 1, sizeof(char));
-	strcpy(cl->secondop, lineParts[commandIndex + 3]);
+	/* If there is only one operand fill the secondOp and leave the firstOp null */
+	if (strlen(lineParts[commandIndex+3]))
+	{
+		cl->firstop = (char*) calloc(strlen(lineParts[commandIndex + 2]) + 1, sizeof(char));
+		strcpy(cl->firstop, lineParts[commandIndex + 2]);
+		cl->secondop = (char*) calloc(strlen(lineParts[commandIndex + 3]) + 1, sizeof(char));
+		strcpy(cl->secondop, lineParts[commandIndex + 3]);
+	}
+	else
+	{
+		cl->secondop = (char*) calloc(strlen(lineParts[commandIndex + 2]) + 1, sizeof(char));
+		strcpy(cl->secondop, lineParts[commandIndex + 2]);
+	}
 
 	free_line_parts(lineParts, 5);
 	return cl;
@@ -326,7 +332,11 @@ void fill_operand(char* operandString, command* comm, int* miun, int* reg)
 
 	/* we don't have to do nothing if the operand is null or if its length is zero */
 	if (operandString == NULL || strlen(operandString) == 0)
+	{
+		*miun = 0;
+		*reg = 0;
 		return;
+	}
 
 	operandStringCopy = (char*) calloc(strlen(operandString) + 1, sizeof(char));
 	strcpy(operandStringCopy, operandString);
@@ -416,7 +426,7 @@ void fill_miun_index_meguvan(char* operandString, command* comm, int* miun, int*
 		*reg = reg_num;
 	}
 	/* check if label represents a number */
-	else if (is_numeric(label[0]))
+	else if (is_numeric(label))
 	{
 		sscanf(label, "%d", &constant);
 		/* if we got to this line, it means it's the second word is a number */
@@ -426,13 +436,13 @@ void fill_miun_index_meguvan(char* operandString, command* comm, int* miun, int*
 	}
 	else
 	{
-		/* if we got to this line, it means it's the second word is a label */
+		/* it means it's the second word is a label */
 		extra_word_count = comm->extra_word_count++;
 		labelLength = strlen(label) + 1;
 		comm->extra_words[extra_word_count].label_name = (char*) calloc(labelLength, sizeof(char));
 		strcpy(comm->extra_words[extra_word_count].label_name, label);
 		comm->extra_words[extra_word_count].label_name[labelLength - 1] = '\0';
-		comm->extra_words_type[extra_word_count] = 'r';
+		comm->extra_words_type[extra_word_count] = 'd';
 	}
 }
 

@@ -43,7 +43,7 @@ void write_symbol(FILE *file, symbol *sym);
 void write_external(FILE *file, symbol *sym);
 
 /*
-** Cast unsigned int to octal representation and write it as a line
+** Cast int to octal representation and write it as a line
 */
 int cast_decimal_to_octal(unsigned int data);
 

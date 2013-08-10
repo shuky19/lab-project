@@ -103,7 +103,17 @@ int get_first_non_blank_pos(char *string) {
 /*
  * Returns if a char is numeric
  */
-int is_numeric(char s)
+int is_numeric(char *str)
 {
-	return s >= 48 && s <= 57;
+	int i;
+
+	for (i = 0; i < strlen(str); ++i)
+	{
+		if((i != 0 || str[i] != '-') && (str[i] < 48 || str[i] > 57))
+		{
+			return 0;
+		}
+	}
+
+	return 1;
 }

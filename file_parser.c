@@ -167,9 +167,27 @@ void fix_symbol_references() {
 				int address = get_symbol_address(sym_table, symbol_name, ic->word_counter);
 
 				/* If symbol was not found */
-				if (address == -1) {
+				if (current_command->extra_words_type[j] == 'd')
+				{
+					if(address == -1)
+					{
+						printf("Error!\n");
+					}
+					else
+					{
+						assign_symbol_adderss(current_command, j, address);
+
+						current_command->extra_words_type[j] = 'a';
+						int last_address = current_command->extra_words[j-1].number;
+						int current_address = current_command->extra_words[j].number;
+						current_command->extra_words[j].number = current_address - last_address;
+					}
+				}
+				else if (address == -1) {
 					/* It's an external symbol reference */
 					handle_external_reference(symbol_name, current_command->address + j + 1);
+					current_command->extra_words_type[j] = 'e';
+					current_command->extra_words[j].number = 0;
 				} else {
 					assign_symbol_adderss(current_command, j, address);
 				}

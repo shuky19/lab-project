@@ -69,7 +69,7 @@ void write_command(FILE *file, command *comm) {
 		int extra_word = cast_decimal_to_octal(comm->extra_words[i].number);
 		char extra_word_type = comm->extra_words_type[i];
 		print_octal(file, extra_word);
-		fprintf(file, "%d %c\n", extra_word, extra_word_type);
+		fprintf(file, " %c\n", extra_word_type);
 	}
 }
 
@@ -94,7 +94,7 @@ void write_symbol(FILE *file, symbol *sym) {
 }
 
 /*
- ** Cast unsigned int to octal representation and write it as a line
+ ** Cast int to octal representation and write it as a line
  */
 int cast_decimal_to_octal(unsigned int data) {
 	int digit, digit_count = 0, sum = 0;
@@ -125,13 +125,13 @@ int cast_decimal_to_octal(unsigned int data) {
 void print_octal(FILE *file, int octal)
 {
 	int i;
-	char buffer[7];
+	char buffer[15];
 	int length = sprintf(buffer, "%d", octal);
 
-	for (i=0; i<7-2; ++i)
+	for (i=0; i<7-length; ++i)
 	{
 		fprintf(file, "%c", '0');
 	}
 
-	fprintf(file, "%u", octal);
+	fprintf(file, "%d", octal);
 }

@@ -37,4 +37,4 @@ void free_line_parts(char** lineParts, int length);
 /*
  * Returns if a char is numeric
  */
-int is_numeric(char s);
+int is_numeric(char *str);
