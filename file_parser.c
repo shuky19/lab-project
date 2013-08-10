@@ -163,36 +163,53 @@ void fix_symbol_references() {
 
 		/* Run over all needed symbols */
 		for (j = 0; j < current_command->extra_word_count; ++j) {
+
+			/* Look for relative or extern word type only */
 			if (current_command->extra_words_type[j] != 'a') {
+
+				/* symbol name to look it's address */
 				char *symbol_name = current_command->extra_words[j].label_name;
 
 				/* Try find symbol in symbol table */
 				int address = get_symbol_address(sym_table, symbol_name, ic->word_counter);
 
-				/* If symbol was not found */
+				/* 'd' symbolies extra work that should be replaced by the 
+				   distnace from the current command to the label in the extra word 
+				   Case: <command> <label>{*<label>}, ... */
 				if (current_command->extra_words_type[j] == 'd')
 				{
+					/* If label address was not found print error*/
 					if(address == -1)
 					{
-						printf("Error!\n");
+						printf("Error: Label %s was not found in file.\n", symbol_name);
+						is_error = 1;
 					}
+					/* If label address was found */
 					else
 					{
-						int last_address, current_address;
+						int command_address, current_address;
+
+						/* Replace the label name with its address in the current extra word */
 						assign_symbol_adderss(current_command, j, address);
 
+						/* Change current command type to be absolute */
 						current_command->extra_words_type[j] = 'a';
-						last_address = current_command->address;
+						command_address = current_command->address;
 						current_address = current_command->extra_words[j].number;
-						current_command->extra_words[j].number = current_address - last_address;
+
+						/* Set the extra word value */
+						current_command->extra_words[j].number = current_address - command_address;
 					}
 				}
+				/* Case of referencing to external label */
 				else if (address == -1) {
 					/* It's an external symbol reference */
 					handle_external_reference(symbol_name, current_command->address + j + 1);
 					current_command->extra_words_type[j] = 'e';
 					current_command->extra_words[j].number = 0;
-				} else {
+				} 
+				/* Case of referencing to normal label*/
+				else {
 					assign_symbol_adderss(current_command, j, address);
 				}
 			}
@@ -218,7 +235,7 @@ void fix_entry_symbol_table() {
  ** Handle an external reference inside a command line
  */
 void handle_external_reference(char *symbol_name, int line_address) {
-	int i;
+	int i, was_found = 0;
 
 	/* Run over all entry symbols */
 	for (i = 0; i < external_counter->index; ++i) {
@@ -228,8 +245,14 @@ void handle_external_reference(char *symbol_name, int line_address) {
 		if (strncmp(symbol_name, external_symbol, MAX_SYMBOL_LENGTH) == 0) {
 			/* Add symbol to the external symbols table */
 			add_symbol(external_sym_table, symbol_name, line_address, EXTERNAL_TABLE);
+			was_found = 1;
 			break;
 		}
+	}
+
+	if(!was_found)
+	{
+		printf("Error: Label %s was not found in file nor in the external references. \n", symbol_name);
 	}
 }
 
