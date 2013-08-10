@@ -1,11 +1,12 @@
 #include "file_parser.h"
 
-instructions_counter *ic;
-data_counter *dc;
-data_counter *external_counter;
-symbols_table *sym_table;
-symbols_table *entry_sym_table;
-symbols_table *external_sym_table;
+static instructions_counter *ic;
+static data_counter *dc;
+static data_counter *external_counter;
+static symbols_table *sym_table;
+static symbols_table *entry_sym_table;
+static symbols_table *external_sym_table;
+static int is_error;
 
 /*
  ** Compile file
@@ -40,8 +41,15 @@ void parse_file(char *file_name) {
 	second_round();
 
 	/* Write all files acourding to tables */
-	write_files(file_name, ic, dc, sym_table, entry_sym_table,
-			external_sym_table);
+	if (!is_error)
+	{
+		write_files(file_name, ic, dc, sym_table, entry_sym_table,
+				external_sym_table);
+	}
+	else
+	{
+		printf("Compilation failed.\n");
+	}
 
 	close_file(file);
 }
@@ -52,7 +60,7 @@ void parse_file(char *file_name) {
  */
 void first_round(FILE *file) {
 	char *line = (char *) calloc(MAX_LINE_LENGTH, sizeof(char));
-	while (next_line(file, line, MAX_LINE_LENGTH) != -1) {
+	while (next_line(file, line, MAX_LINE_LENGTH, &is_error) != -1) {
 		handle_line(line);
 	}
 
@@ -80,7 +88,7 @@ void second_round() {
  ** Handle one line in the file
  */
 void handle_line(char *line) {
-	switch (get_line_type(line)) {
+	switch (get_line_type(line, &is_error)) {
 	case COMMAND:
 		handle_command(line);
 		break;
@@ -103,10 +111,10 @@ void handle_line(char *line) {
  */
 void handle_command(char *line) {
 	/* Get the parsed command */
-	command_line *comm_line = get_command_line(line);
+	command_line *comm_line = get_command_line(line, &is_error);
 
 	/* Compile the command (Symbols references are left with names) */
-	command *comm = get_command(comm_line);
+	command *comm = get_command(comm_line, &is_error);
 
 	/* If this line contains symbols
 	 add them to sym_table */
@@ -123,7 +131,7 @@ void handle_command(char *line) {
  */
 void handle_instruction(char *line) {
 	/* Get parsed instruction */
-	instruction_line *inst_line = get_instruction_line(line);
+	instruction_line *inst_line = get_instruction_line(line, &is_error);
 
 	if (inst_line->command == DATA || inst_line->command == STRING) {
 		/* If this line contains symbols
@@ -176,7 +184,7 @@ void fix_symbol_references() {
 					else
 					{
 						int last_address, current_address;
-						assign_symbol_adderss(current_command, j, address);
+						assign_symbol_adderss(current_command, j, address, &is_error);
 
 						current_command->extra_words_type[j] = 'a';
 						last_address = current_command->address;
@@ -190,7 +198,7 @@ void fix_symbol_references() {
 					current_command->extra_words_type[j] = 'e';
 					current_command->extra_words[j].number = 0;
 				} else {
-					assign_symbol_adderss(current_command, j, address);
+					assign_symbol_adderss(current_command, j, address, &is_error);
 				}
 			}
 		}
@@ -240,4 +248,5 @@ void initialize() {
 	sym_table = create_symbol_table();
 	entry_sym_table = create_symbol_table();
 	external_sym_table = create_symbol_table();
+	is_error = 0;
 }
