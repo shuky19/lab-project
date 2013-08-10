@@ -5,6 +5,7 @@
 #include "counter.h"
 #include "structure.h"
 #include "file_manager.h"
+#include <math.h>
 #include <stdio.h>
 
 /*
@@ -45,7 +46,7 @@ void write_external(FILE *file, symbol *sym);
 /*
 ** Cast int to octal representation and write it as a line
 */
-int cast_decimal_to_octal(unsigned int data);
+int cast_decimal_to_octal(int data);
 
 /*
 ** Print octal numbers with '0's before to complete 8 digits

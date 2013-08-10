@@ -430,14 +430,14 @@ void fill_miun_index_meguvan(char* operandString, command* comm, int* miun, int*
 	else if (is_numeric(label))
 	{
 		sscanf(label, "%d", &constant);
-		/* if we got to this line, it means it's the second word is a number */
+		/* if we got to this line, it means the second word is a number */
 		extra_word_count = comm->extra_word_count++;
 		comm->extra_words[extra_word_count].number = constant;
 		comm->extra_words_type[extra_word_count] = 'a';
 	}
 	else
 	{
-		/* it means it's the second word is a label */
+		/* it means the second word is a label */
 		extra_word_count = comm->extra_word_count++;
 		labelLength = strlen(label) + 1;
 		comm->extra_words[extra_word_count].label_name = (char*) calloc(labelLength, sizeof(char));

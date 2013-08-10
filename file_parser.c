@@ -179,7 +179,7 @@ void fix_symbol_references() {
 						assign_symbol_adderss(current_command, j, address);
 
 						current_command->extra_words_type[j] = 'a';
-						last_address = current_command->extra_words[j-1].number;
+						last_address = current_command->address;
 						current_address = current_command->extra_words[j].number;
 						current_command->extra_words[j].number = current_address - last_address;
 					}

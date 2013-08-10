@@ -1,16 +1,18 @@
 file_parser:
- ☐ initialize counter and tables every call
+ ✔ initialize counter and tables every call @done (13-08-10 17:17)
  ✔ refactor all symbols fix logic @done (13-07-27 17:14)
- ☐ add method for setting start address 100(decimal)
- ☐ change all file management to user file_manager
+ ✔ add method for setting start address 100(decimal) @done (13-08-10 17:17)
+ ✔ change all file management to user file_manager @done (13-08-10 17:17)
 file_writer:
  ✔ implement all writing line methods @done (13-07-27 17:14)
  ✔ implemet file creations @done (13-07-27 17:14)
 line_parser:
- ☐ implemet all methods
+ ✔ implemet all methods @done (13-08-10 17:17)
 string_help:
- ☐ rewrite all methods acourding to needs of line parser
+ ✔ rewrite all methods acourding to needs of line parser @done (13-08-10 17:17)
 assembler:
- ☐ handle arguments and calling for file_parser
+ ✔ handle arguments and calling for file_parser @done (13-08-10 17:17)
 general:
  ☐ handle errors
+ ☐ free memory
+ ☐ 8 complement

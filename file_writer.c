@@ -96,26 +96,69 @@ void write_symbol(FILE *file, symbol *sym) {
 /*
  ** Cast int to octal representation and write it as a line
  */
-int cast_decimal_to_octal(unsigned int data) {
-	int digit, digit_count = 0, sum = 0;
-	int octal = 0;
+int cast_decimal_to_octal(int data) {
+	int digit, digit_count = 0, i=0, is_negetive = 0, octal = 0, base = 1;
+	int *digits = (int *)calloc(8, sizeof(int));
+
+	if (data < 0)
+	{
+		is_negetive = 1;
+		data = 10000000-data;
+	}
+
 
 	/* Get all digits in reverse */
-		while (data > 0) {
+	while (data > 0)
+	{
+		/* Get digit */
 		digit = data % 8;
-		sum = sum * 10 + digit;
+		digits[digit_count++] = digit;
+
+		/* Remove from source */
 		data = data / 8;
-		digit_count++;
 	}
 
 	/* Reverse sum */
-	while (digit_count > 0) {
-		digit = sum % 10;
-		octal = octal * 10 + digit;
-		sum = sum / 10;
-		digit_count--;
+	for (i = 0; i < digit_count/2; ++i)
+	{
+		int tmp = digits[i];
+		digits[i] = digits[digit_count-i];
+		digits[digit_count-i] = tmp;
 	}
 
+	/* Deal with the negative number.  First, take the
+     * complement of the current bit.  This number will
+     * be 2 less than the bit we want, so add 2.  Then
+     * add the carry.  If the result is > 1, it's no
+     * longer binary, so set it to 0 and try the next
+     * bit.  Continue this until we can successfully add
+     * the carry bit. Once it is added, or once we've
+     * finished the loop, we're done.
+     */
+    if (is_negetive) 
+    {
+    	int carry = 1;
+		i = 0;
+
+        for(i=digit_count; i>=0; i--){
+                digits[i] = 7-digits[i];
+        }
+
+    	while(carry)
+    	{
+    		carry = digits[i] == 7;
+    		digits[i] += 1;
+    		++i;
+    	}
+    }
+	
+    for (i = 0; i < digit_count; ++i)
+    {
+    	octal = octal + digits[i] * base;
+    	base *= 10;
+    }
+
+	free(digits);
 	return octal;
 }
 
