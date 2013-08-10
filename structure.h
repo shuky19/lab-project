@@ -35,17 +35,6 @@ typedef union
  */
 typedef struct
 {
-<<<<<<< HEAD
-	unsigned comb : 2;
-	unsigned dest_reg : 3;
-	unsigned dest_miun : 2;
-	unsigned source_reg : 3;
-	unsigned source_miun : 2;
-	unsigned opcode : 4;
-	unsigned type : 1;
-	unsigned dbl : 1;
-	unsigned : 4;
-=======
 	unsigned comb :2;
 	unsigned dest_reg :3;
 	unsigned dest_miun :2;
@@ -55,7 +44,6 @@ typedef struct
 	unsigned type :1;
 	unsigned dbl :1;
 	unsigned :4;
->>>>>>> 89de580d5dd5ab390c41a92ffcc72ec31f1e989a
 	unsigned char extra_words_type[4]; /* Represent words type ('a', 'r', 'e') */
 	command_extra_words extra_words[4];
 	int extra_word_count;
