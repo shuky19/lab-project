@@ -209,15 +209,13 @@ command *get_command(command_line *comm_line, int *is_error)
 	int miun, reg;
 	command *comm = (command *) calloc_with_validation(1, sizeof(command));
 
-	comm->extra_word_count = 0;
-
 	fill_opcpde(comm_line->command, comm, is_error);
 	fill_type_comb(comm_line->command, comm, is_error);
 	comm->dbl = comm_line->dbl;
 
 	/* if we found an error until now, we shouldn't check the operands (we don't know
 	 *  what the miun type can be), so we return the command we parsed until now.	 */
-	if (is_error)
+	if (comm->error == 1)
 	{
 		return comm;
 	}
@@ -261,6 +259,7 @@ void fill_type_comb(char* commandString, command* comm, int *is_error)
 	else
 	{
 		print_error(is_error, "Unknown command type (neither 0 nor 1)");
+		comm->error = 1;
 	}
 
 
@@ -345,6 +344,7 @@ void fill_opcpde(char* commandString, command* comm, int *is_error)
 	else
 	{
 		print_error(is_error, "Unknown command");
+		comm->error = 1;
 	}
 
 	free_line_parts(commandParts, 1);
