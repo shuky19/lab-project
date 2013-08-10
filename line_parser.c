@@ -592,7 +592,7 @@ void verify_dest_operand(char* operandString, command *comm, int *is_error)
 			break;
 		case RTS:
 		case STOP:
-			if (operandDoesntExist != 0)
+			if (operandDoesntExist != 1)
 			{
 				print_error(is_error, "Wrong number of operands");
 			}
