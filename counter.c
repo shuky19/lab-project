@@ -113,15 +113,10 @@ instructions_counter *create_instruction_counter()
 */
 void free_instruction_counter(instructions_counter *ic)
 {
-	int i, j;
+	int i;
 
 	for (i = 0; i < ic->index; ++i)
 	{
-		for (j = 0; j < ic->instructions[i]->extra_word_count; ++j)
-		{
-			free(ic->instructions[i]->extra_words[j].label_name);
-		}
-
 		free(ic->instructions[i]);
 	}
 

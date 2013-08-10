@@ -223,7 +223,7 @@ command *get_command(command_line *comm_line, int *is_error)
 	fill_operand(comm_line->secondop, comm, &miun, &reg);
 	comm->dest_miun = miun;
 	comm->dest_reg = reg;
-	verify_dest_operand(comm_line->firstop, comm, is_error);
+	verify_dest_operand(comm_line->secondop, comm, is_error);
 
 	return comm;
 }
@@ -538,7 +538,7 @@ void verify_source_operand(char* operandString, command *comm, int *is_error)
 	case JSR:
 	case RTS:
 	case STOP:
-		if (operandDoesntExist != 0)
+		if (operandDoesntExist != 1)
 		{
 			print_error(is_error, "Wrong number of operands");
 		}
@@ -568,7 +568,7 @@ void verify_dest_operand(char* operandString, command *comm, int *is_error)
 			{
 				print_error(is_error, "Wrong number of operands");
 			}
-			else if (comm->source_miun == 0)
+			else if (comm->dest_miun == 0)
 			{
 				print_error(is_error, "The miun type doesn't can't be used with the command");
 			}
@@ -585,8 +585,9 @@ void verify_dest_operand(char* operandString, command *comm, int *is_error)
 			{
 				print_error(is_error, "Wrong number of operands");
 			}
-			else if (comm->source_miun != 1)
-			{/* TODO: error - the miun type doesn't can't be used with this operand */
+			else if (comm->dest_miun != 1)
+			{
+				print_error(is_error, "The miun type doesn't can't be used with the command");
 			}
 			break;
 		case RTS:
@@ -604,6 +605,7 @@ void verify_dest_operand(char* operandString, command *comm, int *is_error)
  */
 void assign_symbol_adderss(command *comm, int symbol_index, int symbol_address)
 {
+	free(comm->extra_words[symbol_index].label_name);
 	comm->extra_words[symbol_index].number = symbol_address;
 }
 
