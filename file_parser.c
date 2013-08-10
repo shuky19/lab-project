@@ -187,6 +187,7 @@ void fix_symbol_references() {
 					/* It's an external symbol reference */
 					handle_external_reference(symbol_name, current_command->address + j + 1);
 					current_command->extra_words_type[j] = 'e';
+					current_command->extra_word_count = 1;
 					current_command->extra_words[j].number = 0;
 				} else {
 					assign_symbol_adderss(current_command, j, address);

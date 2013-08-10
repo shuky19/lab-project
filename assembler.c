@@ -12,5 +12,5 @@ int main(int argc, char *argv[])
 		parse_file(argv[i]);
 	}
 
-	return 1;
+	return 0;
 }

@@ -7,7 +7,6 @@
 STRADD: .data 0
 STR: .string "abcdef"
 LASTCHAR: .data 0
-
 LEN: .data 0
 K: .data 0
 ; count length of string, print the original string, revese string, print reverse string

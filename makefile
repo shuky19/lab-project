@@ -1,4 +1,4 @@
-all: pre-clean project.o post-clean
+all: pre-clean project.o post-clean run-program
 
 project.o: structure.o file_manager.o file_writer.o assembler.o counter.o file_parser.o line_parser.o string_helper.o
 	     @gcc -g -rdynamic structure.o file_manager.o file_writer.o assembler.o counter.o file_parser.o line_parser.o string_helper.o -o project
@@ -35,3 +35,7 @@ pre-clean:
 
 post-clean:
 	@rm -rf *.o
+
+run-program:
+	@chmod +x project
+	@./project example

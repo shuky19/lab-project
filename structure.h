@@ -5,7 +5,7 @@
 
 #ifndef STRUCTURE
 #define STRUCTURE value
-#define WORD_LENGTH 2
+#define WORD_LENGTH 3
 
 /*
 ** Represnt a type of line in the source file
@@ -40,6 +40,7 @@ typedef struct
 	unsigned opcode : 4;
 	unsigned type : 1;
 	unsigned dbl : 1;
+	unsigned : 4;
 	unsigned char extra_words_type[4]; /* Represent words type ('a', 'r', 'e') */
 	command_extra_words extra_words[4];
 	int extra_word_count;
