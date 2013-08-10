@@ -5,7 +5,7 @@
  */
 void remove_double_spaces(char *line, int length) {
 	int i, j = 0;
-	char* tmp_line = (char*) calloc(length, sizeof(char));
+	char* tmp_line = (char*) calloc_with_validation(length, sizeof(char));
 	int start_position;
 	strcpy(tmp_line, line);
 
@@ -35,16 +35,16 @@ char **get_all_parts(char *line, int max_parts, char *seperators) {
 	int i = 0, j;
 
 	/* first we will copy the given line to keep it unchanged */
-	lineCopy = (char*) calloc(strlen(line)+1, sizeof(char));
+	lineCopy = (char*) calloc_with_validation(strlen(line)+1, sizeof(char));
 	strcpy(lineCopy, line);
 
-	parts = calloc(max_parts, sizeof(char *));
+	parts = calloc_with_validation(max_parts, sizeof(char *));
 	if (parts == NULL) {
 		/* TODO: ERROR: Not ENOUGH MEMORY */
 	}
 
 	for (j = 0; j < max_parts; ++j) {
-		parts[j] = calloc(MAX_LINE_LENGTH, sizeof(char));
+		parts[j] = calloc_with_validation(MAX_LINE_LENGTH, sizeof(char));
 		if (parts[j] == NULL) {
 			/* TODO: ERROR: Not ENOUGH MEMORY */
 			printf("ERROR");

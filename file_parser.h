@@ -4,6 +4,7 @@
 */
 #include "counter.h"
 #include "structure.h"
+#include "memory_helper.h"
 #include "line_parser.h"
 #include "file_writer.h"
 #include <stdlib.h>
@@ -63,3 +64,8 @@ void handle_external_reference(char *symbol_name, int line_address);
 ** Initialize all tables and counters
 */
 void initialize();
+
+/*
+** Free all counter that was used in parsing process
+*/
+void free_counters();

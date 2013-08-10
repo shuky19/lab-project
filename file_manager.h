@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "memory_helper.h"
 
 /*
 ** Delete and create file with name: file_name.extension

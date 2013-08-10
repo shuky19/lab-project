@@ -40,9 +40,10 @@ void parse_file(char *file_name) {
 	 */
 	second_round();
 
-	/* Write all files acourding to tables */
+	/* Write files only if no error was found */
 	if (!is_error)
 	{
+		/* Write all files acourding to tables */
 		write_files(file_name, ic, dc, sym_table, entry_sym_table,
 				external_sym_table);
 	}
@@ -51,6 +52,7 @@ void parse_file(char *file_name) {
 		printf("Compilation failed.\n");
 	}
 
+	free_counters();
 	close_file(file);
 }
 
@@ -59,7 +61,7 @@ void parse_file(char *file_name) {
  ** commands, and filling all necessary tables
  */
 void first_round(FILE *file) {
-	char *line = (char *) calloc(MAX_LINE_LENGTH, sizeof(char));
+	char *line = (char *) calloc_with_validation(MAX_LINE_LENGTH, sizeof(char));
 	while (next_line(file, line, MAX_LINE_LENGTH, &is_error) != -1) {
 		handle_line(line);
 	}
@@ -249,4 +251,17 @@ void initialize() {
 	entry_sym_table = create_symbol_table();
 	external_sym_table = create_symbol_table();
 	is_error = 0;
+}
+
+/*
+** Free all counter that was used in parsing process
+*/
+void free_counters()
+{
+	free_data_counter(dc);
+	free_data_counter(external_counter);
+	free_instruction_counter(ic);
+	free_symbol_table(sym_table);
+	free_symbol_table(entry_sym_table);
+	free_symbol_table(external_sym_table);
 }

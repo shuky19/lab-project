@@ -1,7 +1,7 @@
 all: pre-clean project.o post-clean run-program
 
-project.o: structure.o file_manager.o file_writer.o assembler.o counter.o file_parser.o line_parser.o string_helper.o
-	     @gcc -Wall -pedantic -ansi -g -rdynamic structure.o file_manager.o file_writer.o assembler.o counter.o file_parser.o line_parser.o string_helper.o -o project
+project.o: structure.o file_manager.o file_writer.o assembler.o counter.o file_parser.o line_parser.o string_helper.o memory_helper.o
+	     @gcc -Wall -pedantic -ansi -g -rdynamic structure.o file_manager.o file_writer.o assembler.o counter.o file_parser.o line_parser.o string_helper.o memory_helper.o -o project
 
 assembler.o:
 	@gcc -Wall -pedantic -ansi -c -g -rdynamic assembler.c -o assembler.o
@@ -26,6 +26,9 @@ structure.o:
 
 string_helper.o:	
 	 @gcc -Wall -pedantic -ansi -c  -g -rdynamic string_helper.c -o string_helper.o
+
+memory_helper.o:	
+	 @gcc -Wall -pedantic -ansi -c  -g -rdynamic memory_helper.c -o memory_helper.o
 
 pre-clean:
 	@rm -rf *.o

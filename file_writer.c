@@ -109,7 +109,7 @@ void print_array(int *arr)
  */
 int cast_decimal_to_octal(int data) {
 	int digit = 0, digit_count = 0, i=0, is_negetive = 0, octal = 0, base = 1;
-	int *digits = (int *)calloc(8, sizeof(int));
+	int *digits = (int *)calloc_with_validation(8, sizeof(int));
 
 	if (data < 0)
 	{

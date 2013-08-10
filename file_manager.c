@@ -6,9 +6,10 @@
 FILE *recreate_file(char *file_name, char *extension)
 {
 	FILE *file;
-	char *full_name = (char *)calloc(strlen(file_name) + strlen(extension)+1, sizeof(char));
+	char *full_name = (char *)calloc_with_validation(strlen(file_name) + strlen(extension)+1, sizeof(char));
 	get_full_file_name(full_name, file_name, extension);
 	file = fopen(full_name, "w");
+	free(full_name);
 	return file;
 }
 
@@ -18,9 +19,10 @@ FILE *recreate_file(char *file_name, char *extension)
 FILE *open_file(char *file_name, char *extension)
 {
 	FILE *file;
-	char *full_name = (char *)calloc(strlen(file_name) + strlen(extension)+1, sizeof(char));
+	char *full_name = (char *)calloc_with_validation(strlen(file_name) + strlen(extension)+1, sizeof(char));
 	get_full_file_name(full_name, file_name, extension);
 	file = fopen(full_name, "r");
+	free(full_name);
 	return file;
 }
 

@@ -34,7 +34,7 @@ int get_symbol_address(symbols_table *table, char *symbol_name, int data_start_a
 */
 void add_symbol(symbols_table *table, char *name, int address, symbol_source source)
 {
-	symbol *sym = (symbol *)malloc(sizeof(symbol));
+	symbol *sym = (symbol *)malloc_with_validation(sizeof(symbol));
 	sym->name = name;
 	sym->address = address;
 	sym->source = source;
@@ -72,8 +72,8 @@ void add_instruction(instructions_counter *ic, command *comm)
 */
 symbols_table *create_symbol_table()
 {
-	symbols_table *sym_table = (symbols_table *)malloc(sizeof(symbols_table));
-	sym_table->symbols = (symbol **)calloc(MAX_TABLE_LENGTH, sizeof(symbol *));	
+	symbols_table *sym_table = (symbols_table *)malloc_with_validation(sizeof(symbols_table));
+	sym_table->symbols = (symbol **)calloc_with_validation(MAX_TABLE_LENGTH, sizeof(symbol *));	
 	sym_table->counter = 0;
 	return sym_table;
 }
@@ -100,8 +100,8 @@ void free_symbol_table(symbols_table *sym_table)
 */
 instructions_counter *create_instruction_counter()
 {
-	instructions_counter *ic = (instructions_counter *)malloc(sizeof(instructions_counter));
-	ic->instructions = (command **)calloc(MAX_TABLE_LENGTH, sizeof(command *));
+	instructions_counter *ic = (instructions_counter *)malloc_with_validation(sizeof(instructions_counter));
+	ic->instructions = (command **)calloc_with_validation(MAX_TABLE_LENGTH, sizeof(command *));
 	ic->index = 0;
 	ic->word_counter = START_ADDRESS;
 
@@ -113,6 +113,20 @@ instructions_counter *create_instruction_counter()
 */
 void free_instruction_counter(instructions_counter *ic)
 {
+	int i, j;
+
+	for (i = 0; i < ic->index; ++i)
+	{
+		for (j = 0; j < ic->instructions[i]->extra_word_count; ++j)
+		{
+			free(ic->instructions[i]->extra_words[j].label_name);
+		}
+
+		free(ic->instructions[i]);
+	}
+
+	free(ic->instructions);
+	free(ic);
 }
 
 /*
@@ -120,8 +134,8 @@ void free_instruction_counter(instructions_counter *ic)
 */
 data_counter *create_data_counter()
 {
-	data_counter *dc = (data_counter *)malloc(sizeof(data_counter));
-	dc->data = (instruction_line **)calloc(MAX_TABLE_LENGTH, sizeof(instruction_line *));
+	data_counter *dc = (data_counter *)malloc_with_validation(sizeof(data_counter));
+	dc->data = (instruction_line **)calloc_with_validation(MAX_TABLE_LENGTH, sizeof(instruction_line *));
 	dc->index = 0;
 	dc->word_counter = 0;
 
@@ -131,7 +145,26 @@ data_counter *create_data_counter()
 /*
 ** Free data counter from memory
 */
-void free_data_counter(data_counter *ic)
+void free_data_counter(data_counter *dc)
 {
+	int i;
 
+	for (i = 0; i < dc->index; ++i)
+	{
+		free(dc->data[i]->label);
+
+		if (dc->data[i]->command == DATA)
+		{
+			free(dc->data[i]->content.data);
+		}
+		else
+		{
+			free(dc->data[i]->content.symbol_name);
+		}
+
+		free(dc->data[i]);
+	}
+
+	free(dc->data);
+	free(dc);
 }

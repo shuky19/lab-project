@@ -7,6 +7,7 @@
 #ifndef COUNTER
 #define COUNTER value
 #include "structure.h"
+#include "memory_helper.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
