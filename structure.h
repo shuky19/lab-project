@@ -47,6 +47,7 @@ typedef struct
 	unsigned char extra_words_type[4]; /* Represent words type ('a', 'r', 'e') */
 	command_extra_words extra_words[4];
 	int extra_word_count;
+	unsigned error :1;
 	int address; /* Represent the starting address of this command */
 } command;
 
