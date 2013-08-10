@@ -93,19 +93,29 @@ void write_symbol(FILE *file, symbol *sym) {
 	fprintf(file, "%s %d\n", sym->name, cast_decimal_to_octal(sym->address));
 }
 
+void print_array(int *arr)
+{
+	int i;
+	for (i = 7; i >= 0; --i)
+	{
+		printf("%d, ", arr[i]);
+	}
+
+	printf("\n");
+}
+
 /*
  ** Cast int to octal representation and write it as a line
  */
 int cast_decimal_to_octal(int data) {
-	int digit, digit_count = 0, i=0, is_negetive = 0, octal = 0, base = 1;
+	int digit = 0, digit_count = 0, i=0, is_negetive = 0, octal = 0, base = 1;
 	int *digits = (int *)calloc(8, sizeof(int));
 
 	if (data < 0)
 	{
 		is_negetive = 1;
-		data = 10000000-data;
+		data = -data;
 	}
-
 
 	/* Get all digits in reverse */
 	while (data > 0)
@@ -118,41 +128,30 @@ int cast_decimal_to_octal(int data) {
 		data = data / 8;
 	}
 
-	/* Reverse sum */
-	for (i = 0; i < digit_count/2; ++i)
-	{
-		int tmp = digits[i];
-		digits[i] = digits[digit_count-i];
-		digits[digit_count-i] = tmp;
-	}
-
-	/* Deal with the negative number.  First, take the
-     * complement of the current bit.  This number will
-     * be 2 less than the bit we want, so add 2.  Then
-     * add the carry.  If the result is > 1, it's no
-     * longer binary, so set it to 0 and try the next
-     * bit.  Continue this until we can successfully add
-     * the carry bit. Once it is added, or once we've
-     * finished the loop, we're done.
-     */
     if (is_negetive) 
     {
     	int carry = 1;
-		i = 0;
 
-        for(i=digit_count; i>=0; i--){
+        for(i=7; i>=0; i--){
                 digits[i] = 7-digits[i];
         }
 
+		i = 0;
     	while(carry)
     	{
-    		carry = digits[i] == 7;
     		digits[i] += 1;
+			carry = digits[i] == 8;
+
+    		if (carry)
+    		{
+    			digits[i] = 0;
+    		}
+
     		++i;
     	}
     }
 	
-    for (i = 0; i < digit_count; ++i)
+    for (i = 0; i < 7; ++i)
     {
     	octal = octal + digits[i] * base;
     	base *= 10;
