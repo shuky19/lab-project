@@ -103,7 +103,6 @@ void handle_line(char *line) {
 		break;
 	default:
 		printf("Unknow line type\n");
-		exit(1);
 		break;
 	}
 }
@@ -150,9 +149,6 @@ void handle_instruction(char *line) {
 	} else if (inst_line->command == ENTRY) {
 		/* Add to entry symbols table with no address */
 		add_symbol(entry_sym_table, inst_line->content.symbol_name, 0, ENTRY_TABLE);
-	} else {
-		printf("Unknow instruction type\n");
-		exit(1);
 	}
 }
 
