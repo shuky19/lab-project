@@ -565,17 +565,23 @@ void verify_source_operand(char* operandString, command *comm, int *is_error)
 		if (operandDoesntExist)
 		{
 			print_error(is_error, "Wrong number of operands");
+			/* set the error flag to true */
+			comm->error = 1;
 		}
 		break;
 	case LEA:
 		if (operandDoesntExist)
 		{
 			print_error(is_error, "Wrong number of operands");
+			/* set the error flag to true */
+			comm->error = 1;
 		}
 
 		else if (comm->source_miun == 0)
 		{
 			print_error(is_error, "The miun type doesn't can't be used with the command");
+			/* set the error flag to true */
+			comm->error = 1;
 		}
 		break;
 	case NOT:
@@ -592,6 +598,8 @@ void verify_source_operand(char* operandString, command *comm, int *is_error)
 		if (operandDoesntExist != 1)
 		{
 			print_error(is_error, "Wrong number of operands");
+			/* set the error flag to true */
+			comm->error = 1;
 		}
 		break;
 	}
@@ -618,10 +626,14 @@ void verify_dest_operand(char* operandString, command *comm, int *is_error)
 		if (operandDoesntExist)
 		{
 			print_error(is_error, "Wrong number of operands");
+			/* set the error flag to true */
+			comm->error = 1;
 		}
 		else if (comm->dest_miun == 0)
 		{
 			print_error(is_error, "The miun type doesn't can't be used with the command");
+			/* set the error flag to true */
+			comm->error = 1;
 		}
 		break;
 	case CMP:
@@ -629,16 +641,22 @@ void verify_dest_operand(char* operandString, command *comm, int *is_error)
 		if (operandDoesntExist)
 		{
 			print_error(is_error, "Wrong number of operands");
+			/* set the error flag to true */
+			comm->error = 1;
 		}
 		break;
 	case JSR:
 		if (operandDoesntExist)
 		{
 			print_error(is_error, "Wrong number of operands");
+			/* set the error flag to true */
+			comm->error = 1;
 		}
 		else if (comm->dest_miun != 1)
 		{
 			print_error(is_error, "The miun type doesn't can't be used with the command");
+			/* set the error flag to true */
+			comm->error = 1;
 		}
 		break;
 	case RTS:
@@ -646,6 +664,8 @@ void verify_dest_operand(char* operandString, command *comm, int *is_error)
 		if (operandDoesntExist != 1)
 		{
 			print_error(is_error, "Wrong number of operands");
+			/* set the error flag to true */
+			comm->error = 1;
 		}
 		break;
 	}
