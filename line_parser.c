@@ -43,12 +43,12 @@ line_type get_line_type(char *line)
 /*
  ** Create a command line from the given string
  */
-command_line *get_command_line(char *line)
+command_line *get_command_line(char *line, int *is_error)
 {
 	command_line *cl = (command_line *) malloc_with_validation(sizeof(command_line));
-	/*we will try to get 5 parts: label (if exists), the command, the dbl, the first operand
-	 * and the second operand.*/
-	char** lineParts = get_all_parts(line, 5, ", \t");
+	/*we will try to get 6 parts: label (if exists), the command, the dbl, the first operand
+	 * and the second operand, and any extra operand string (which will cause an error).*/
+	char** lineParts = get_all_parts(line, 6, ", \t");
 	int commandIndex = 0, labelLength;
 
 	/* set the label (if exists) */
@@ -87,6 +87,12 @@ command_line *get_command_line(char *line)
 		strcpy(cl->firstop, lineParts[commandIndex + 2]);
 		cl->secondop = (char*) calloc_with_validation(strlen(lineParts[commandIndex + 3]) + 1, sizeof(char));
 		strcpy(cl->secondop, lineParts[commandIndex + 3]);
+
+		/*if there are any other strings, its an error */
+		if (lineParts[commandIndex + 4] != NULL && strlen(lineParts[commandIndex + 4]) > 0)
+		{
+			print_error(is_error, "Too many operands - more than two");
+		}
 	}
 	else
 	{
@@ -95,7 +101,7 @@ command_line *get_command_line(char *line)
 		strcpy(cl->secondop, lineParts[commandIndex + 2]);
 	}
 
-	free_line_parts(lineParts, 5);
+	free_line_parts(lineParts, 6);
 	return cl;
 }
 
@@ -273,8 +279,17 @@ void fill_type_comb(char* commandString, command* comm, int *is_error)
 		/* If the type bit is 1, we have to set the comb bits too */
 		comm->type = 1;
 
-		comb = (commandParts[2][0] == '1') << 1;
-		comb += commandParts[3][0] == '1';
+		/* set the comb bits */
+		if (((commandParts[2][0] == '1') || (commandParts[2][0] == '0')) &&
+				((commandParts[3][0] == '1') || (commandParts[3][0] == '0')))
+		{
+			comb = (commandParts[2][0] == '1') << 1;
+			comb += commandParts[3][0] == '1';
+		}
+		else
+		{
+			print_error(is_error, "Comb bits are not 0 nor 1.");
+		}
 	}
 	else
 	{

@@ -42,7 +42,7 @@ line_type get_line_type(char *line);
 /*
  ** Create a command line from the given string
  */
-command_line *get_command_line(char *line);
+command_line *get_command_line(char *line, int *is_error);
 
 /*
  ** Create an instruction line from the given string

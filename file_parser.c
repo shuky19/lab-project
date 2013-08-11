@@ -109,7 +109,7 @@ void handle_line(char *line) {
  */
 void handle_command(char *line) {
 	/* Get the parsed command */
-	command_line *comm_line = get_command_line(line);
+	command_line *comm_line = get_command_line(line, &is_error);
 
 	/* Compile the command (Symbols references are left with names) */
 	command *comm = get_command(comm_line, &is_error);
@@ -120,7 +120,7 @@ void handle_command(char *line) {
 		add_symbol(sym_table, comm_line->label, ic->word_counter, COMMAND_TABLE);
 	}
 
-	/* Add the instruction to the intruction counter */
+	/* Add the instruction to the instruction counter */
 	add_instruction(ic, comm);
 }
 
