@@ -2,7 +2,7 @@
 
 /*
 ** Start point of the assembler
-** recieve as input files to compile
+** Receive as input files to compile
 */
 int main(int argc, char *argv[])
 {
@@ -12,5 +12,5 @@ int main(int argc, char *argv[])
 		parse_file(argv[i]);
 	}
 
-	return 0;
+	return EXIT_SUCCESS;
 }
