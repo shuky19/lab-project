@@ -67,17 +67,17 @@ void fill_opcpde(char* commandString, command* comm, int *is_error);
 /*
  * Fills a data instruction
  */
-void fill_data_instruction(instruction_line *line, char** lineParts, int firstDataIndex);
+void fill_data_instruction(instruction_line *line, char** lineParts, int firstDataIndex, int *is_error);
 
 /*
  * Fills an entry or an extern instruction
  */
-void fill_extern_entry_instruction(instruction_line *line, char** lineParts, int firstDataIndex);
+void fill_extern_entry_instruction(instruction_line *line, char** lineParts, int firstDataIndex, int *is_error);
 
 /*
  * Fills a string instruction
  */
-void fill_string_instruction(instruction_line *line, char** lineParts, int firstDataIndex);
+void fill_string_instruction(instruction_line *line, char** lineParts, int firstDataIndex, int *is_error);
 
 /*
  ** Assign symbol address to the command
@@ -87,7 +87,7 @@ void assign_symbol_adderss(command *comm, int symbol_index, int symbol_address);
 /*
  * Fills an operand and its miun type
  */
-void fill_operand(char* operandString, command* comm, int* miun, int* reg);
+void fill_operand(char* operandString, command* comm, int* miun, int* reg, int *is_error);
 
 /*
  * fills an operand that uses mium miadi
@@ -102,7 +102,7 @@ void fill_miun_yashir(char* operandString, command* comm, int* miun);
 /*
  * fills an operand that uses miun-index-meguvan
  */
-void fill_miun_index_meguvan(char* operandString, command* comm, int* miun, int* reg);
+void fill_miun_index_meguvan(char* operandString, command* comm, int* miun, int* reg, int *is_error);
 
 /*
  * Gets a register number out of a string, or returns -1 if the strings doesn't represent any register

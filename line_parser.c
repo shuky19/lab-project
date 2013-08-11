@@ -137,22 +137,22 @@ instruction_line *get_instruction_line(char *line, int *is_error)
 	if (strcmp(lineParts[instructionIndex], ".data") == 0)
 	{
 		il->command = DATA;
-		fill_data_instruction(il, lineParts, instructionIndex + 1);
+		fill_data_instruction(il, lineParts, instructionIndex + 1, is_error);
 	}
 	else if (strcmp(lineParts[instructionIndex], ".string") == 0)
 	{
 		il->command = STRING;
-		fill_string_instruction(il, lineParts, instructionIndex + 1);
+		fill_string_instruction(il, lineParts, instructionIndex + 1, is_error);
 	}
 	else if (strcmp(lineParts[instructionIndex], ".entry") == 0)
 	{
 		il->command = ENTRY;
-		fill_extern_entry_instruction(il, lineParts, instructionIndex + 1);
+		fill_extern_entry_instruction(il, lineParts, instructionIndex + 1, is_error);
 	}
 	else if (strcmp(lineParts[instructionIndex], ".extern") == 0)
 	{
 		il->command = EXTERN;
-		fill_extern_entry_instruction(il, lineParts, instructionIndex + 1);
+		fill_extern_entry_instruction(il, lineParts, instructionIndex + 1, is_error);
 	}
 	else
 	{
@@ -172,11 +172,19 @@ instruction_line *get_instruction_line(char *line, int *is_error)
 /*
  * Fills a data instruction
  */
-void fill_data_instruction(instruction_line *line, char** lineParts, int firstDataIndex)
+void fill_data_instruction(instruction_line *line, char** lineParts, int firstDataIndex, int *is_error)
 {
 	int lastDataIndex = firstDataIndex;
 	int i;
-	/*first we will calculate the number of parts in the data array */
+
+	/*first we will check if we have any parameters */
+	if (lineParts[firstDataIndex] == NULL || strlen(lineParts[firstDataIndex]) == 0)
+	{
+		print_error(is_error, "No parameters in a data instruction");
+		line->error = 1;
+	}
+
+	/* now we will calculate the number of parameters in the data array */
 	while (lineParts[(++lastDataIndex)] != NULL && strlen(lineParts[lastDataIndex]) > 0)
 	{
 	}
@@ -193,12 +201,20 @@ void fill_data_instruction(instruction_line *line, char** lineParts, int firstDa
 /*
  * Fills a string instruction
  */
-void fill_string_instruction(instruction_line *line, char** lineParts, int firstDataIndex)
+void fill_string_instruction(instruction_line *line, char** lineParts, int firstDataIndex, int *is_error)
 {
 	int i;
 	/* we subtract 1 from the length of the word because there are two additional quotation marks we
 	 * don't need, but we add a 0  char to	mark the end of the string */
 	int dataLength = strlen(lineParts[firstDataIndex]) - 1;
+
+	/*first we will check if we have any parameters */
+	if (lineParts[firstDataIndex] == NULL || strlen(lineParts[firstDataIndex]) == 0)
+	{
+		print_error(is_error, "No parameters in a string instruction");
+		line->error = 1;
+	}
+
 	line->content.data = (int*) calloc_with_validation(dataLength, sizeof(int));
 	for (i = 1; i < dataLength; ++i)
 	{
@@ -211,9 +227,17 @@ void fill_string_instruction(instruction_line *line, char** lineParts, int first
 /*
  * Fills an entry or an extern instruction
  */
-void fill_extern_entry_instruction(instruction_line *line, char** lineParts, int firstDataIndex)
+void fill_extern_entry_instruction(instruction_line *line, char** lineParts, int firstDataIndex, int *is_error)
 {
 	int dataLength = strlen(lineParts[firstDataIndex]) + 1;
+
+	/*first we will check if we have any parameters */
+	if (lineParts[firstDataIndex] == NULL || strlen(lineParts[firstDataIndex]) == 0)
+	{
+		print_error(is_error, "No parameters in a string instruction");
+		line->error = 1;
+	}
+
 	line->content.symbol_name = (char*) calloc_with_validation(dataLength, sizeof(char));
 	strcpy(line->content.symbol_name, lineParts[firstDataIndex]);
 	line->content_length = dataLength;
@@ -249,13 +273,13 @@ command *get_command(command_line *comm_line, int *is_error)
 	comm->dbl = comm_line->dbl;
 
 	/* fill and verify the source operand */
-	fill_operand(comm_line->firstop, comm, &miun, &reg);
+	fill_operand(comm_line->firstop, comm, &miun, &reg, is_error);
 	comm->source_miun = miun;
 	comm->source_reg = reg;
 	verify_source_operand(comm_line->firstop, comm, is_error);
 
 	/* fill and verify the destination operand */
-	fill_operand(comm_line->secondop, comm, &miun, &reg);
+	fill_operand(comm_line->secondop, comm, &miun, &reg, is_error);
 	comm->dest_miun = miun;
 	comm->dest_reg = reg;
 	verify_dest_operand(comm_line->secondop, comm, is_error);
@@ -293,6 +317,7 @@ void fill_type_comb(char* commandString, command* comm, int *is_error)
 		else
 		{
 			print_error(is_error, "Comb bits are not 0 nor 1.");
+			comm->error = 1;
 		}
 	}
 	else
@@ -401,7 +426,7 @@ void fill_opcpde(char* commandString, command* comm, int *is_error)
 /*
  * Fills an operand and its miun type
  */
-void fill_operand(char* operandString, command* comm, int* miun, int* reg)
+void fill_operand(char* operandString, command* comm, int* miun, int* reg, int *is_error)
 {
 	int reg_num;
 	char *miun_index_meguvan, *operandStringCopy;
@@ -429,7 +454,7 @@ void fill_operand(char* operandString, command* comm, int* miun, int* reg)
 		/* if the char { exists in the operand, it's a Miun-Index-Meguvan. */
 		if (miun_index_meguvan != NULL)
 		{
-			fill_miun_index_meguvan(operandStringCopy, comm, miun, reg);
+			fill_miun_index_meguvan(operandStringCopy, comm, miun, reg, is_error);
 		}
 		else
 		{
@@ -479,7 +504,7 @@ void fill_miun_yashir(char* operandString, command* comm, int* miun)
 /*
  * fills an operand that uses miun-index-meguvan
  */
-void fill_miun_index_meguvan(char* operandString, command* comm, int* miun, int* reg)
+void fill_miun_index_meguvan(char* operandString, command* comm, int* miun, int* reg, int *is_error)
 {
 	char* label;
 	int labelLength, reg_num, constant;
@@ -519,6 +544,14 @@ void fill_miun_index_meguvan(char* operandString, command* comm, int* miun, int*
 		strcpy(comm->extra_words[extra_word_count].label_name, label);
 		comm->extra_words[extra_word_count].label_name[labelLength - 1] = '\0';
 		comm->extra_words_type[extra_word_count] = 'd';
+	}
+
+	label = strtok(NULL, "");
+	/* Verify that we have no chars after '}' (if we have any another chars, it's an error). */
+	if (label != NULL && strlen(label) > 0)
+	{
+		print_error(is_error, "There are chars after the '}'");
+		comm->error = 1;
 	}
 }
 
