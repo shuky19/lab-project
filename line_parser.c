@@ -1,6 +1,9 @@
 #include "line_parser.h"
 #include "string_helper.h"
 
+/* a counter that will count the amount of lines we read, and will be used  when we print errors */
+static unsigned line_counter = 0;
+
 line_type get_line_type(char *line)
 {
 	int firstNonBlankPos = get_first_non_blank_pos(line);
@@ -78,7 +81,7 @@ command_line *get_command_line(char *line)
 
 	/* If there is only one operand - we fill the secondOp and leave the firstOp null. If there
 	 *  are two operands, we fill both the first and the second operand. */
-	if (strlen(lineParts[commandIndex+3]))
+	if (strlen(lineParts[commandIndex + 3]))
 	{
 		cl->firstop = (char*) calloc_with_validation(strlen(lineParts[commandIndex + 2]) + 1, sizeof(char));
 		strcpy(cl->firstop, lineParts[commandIndex + 2]);
@@ -101,7 +104,7 @@ command_line *get_command_line(char *line)
  */
 instruction_line *get_instruction_line(char *line, int *is_error)
 {
-	instruction_line* il = (instruction_line*)malloc_with_validation(sizeof(instruction_line));
+	instruction_line* il = (instruction_line*) malloc_with_validation(sizeof(instruction_line));
 	/* we try to get at most 20 parts - there might be a lot of arguments if its a
 	 * data instruction. */
 	char** lineParts = get_all_parts(line, 20, ", \t");
@@ -144,7 +147,12 @@ instruction_line *get_instruction_line(char *line, int *is_error)
 	}
 	else
 	{
-		print_error(is_error, "Unknown instruction type");
+		/* print the error message */
+		char *errorString = (char*) calloc_with_validation(strlen(lineParts[instructionIndex]) + 30, sizeof(char));
+		strcat(errorString, "Unknown instruction type: ");
+		strcat(errorString, lineParts[instructionIndex]);
+		print_error(is_error, errorString);
+		free(errorString);
 	}
 
 	free_line_parts(lineParts, 20);
@@ -210,21 +218,33 @@ command *get_command(command_line *comm_line, int *is_error)
 	command *comm = (command *) calloc_with_validation(1, sizeof(command));
 
 	fill_opcpde(comm_line->command, comm, is_error);
-	fill_type_comb(comm_line->command, comm, is_error);
-	comm->dbl = comm_line->dbl;
 
-	/* if we found an error until now, we shouldn't check the operands (we don't know
-	 *  what the miun type can be), so we return the command we parsed until now.	 */
+	/* if we found an error until now, we shouldn't fill the next parts, because we already
+	 *  know this command line contains error.	 */
 	if (comm->error == 1)
 	{
 		return comm;
 	}
 
+	fill_type_comb(comm_line->command, comm, is_error);
+
+	/* if we found an error until now, we shouldn't fill the next parts, because we already
+	 *  know this command line contains error.	 */
+	if (comm->error == 1)
+	{
+		return comm;
+	}
+
+	/* fill the dbl bit */
+	comm->dbl = comm_line->dbl;
+
+	/* fill and verify the source operand */
 	fill_operand(comm_line->firstop, comm, &miun, &reg);
 	comm->source_miun = miun;
 	comm->source_reg = reg;
 	verify_source_operand(comm_line->firstop, comm, is_error);
 
+	/* fill and verify the destination operand */
 	fill_operand(comm_line->secondop, comm, &miun, &reg);
 	comm->dest_miun = miun;
 	comm->dest_reg = reg;
@@ -258,10 +278,12 @@ void fill_type_comb(char* commandString, command* comm, int *is_error)
 	}
 	else
 	{
+		/* print the error message */
 		print_error(is_error, "Unknown command type (neither 0 nor 1)");
+
+		/* set the error flag to true */
 		comm->error = 1;
 	}
-
 
 	comm->comb = comb;
 	free_line_parts(commandParts, 4);
@@ -343,7 +365,14 @@ void fill_opcpde(char* commandString, command* comm, int *is_error)
 	}
 	else
 	{
-		print_error(is_error, "Unknown command");
+		/* print the error message */
+		char *errorString = (char*) calloc_with_validation(strlen(commandName) + 20, sizeof(char));
+		strcat(errorString, "Unknown command: ");
+		strcat(errorString, commandName);
+		print_error(is_error, errorString);
+		free(errorString);
+
+		/* set the error flag to true */
 		comm->error = 1;
 	}
 
@@ -463,7 +492,7 @@ void fill_miun_index_meguvan(char* operandString, command* comm, int* miun, int*
 		comm->extra_words[extra_word_count].number = constant;
 		comm->extra_words_type[extra_word_count] = 'a';
 	}
-	else  /* it means the second word is a label */
+	else /* it means the second word is a label */
 	{
 		extra_word_count = comm->extra_word_count++;
 		labelLength = strlen(label) + 1;
@@ -561,49 +590,49 @@ void verify_dest_operand(char* operandString, command *comm, int *is_error)
 	int operandDoesntExist = operandString == NULL || strlen(operandString) == 0;
 	switch (comm->opcode)
 	{
-		case MOV:
-		case ADD:
-		case SUB:
-		case NOT:
-		case LEA:
-		case INC:
-		case DEC:
-		case JMP:
-		case BNE:
-		case RED:
-			if (operandDoesntExist)
-			{
-				print_error(is_error, "Wrong number of operands");
-			}
-			else if (comm->dest_miun == 0)
-			{
-				print_error(is_error, "The miun type doesn't can't be used with the command");
-			}
-			break;
-		case CMP:
-		case PRN:
-			if (operandDoesntExist)
-			{
-				print_error(is_error, "Wrong number of operands");
-			}
-			break;
-		case JSR:
-			if (operandDoesntExist)
-			{
-				print_error(is_error, "Wrong number of operands");
-			}
-			else if (comm->dest_miun != 1)
-			{
-				print_error(is_error, "The miun type doesn't can't be used with the command");
-			}
-			break;
-		case RTS:
-		case STOP:
-			if (operandDoesntExist != 1)
-			{
-				print_error(is_error, "Wrong number of operands");
-			}
-			break;
+	case MOV:
+	case ADD:
+	case SUB:
+	case NOT:
+	case LEA:
+	case INC:
+	case DEC:
+	case JMP:
+	case BNE:
+	case RED:
+		if (operandDoesntExist)
+		{
+			print_error(is_error, "Wrong number of operands");
+		}
+		else if (comm->dest_miun == 0)
+		{
+			print_error(is_error, "The miun type doesn't can't be used with the command");
+		}
+		break;
+	case CMP:
+	case PRN:
+		if (operandDoesntExist)
+		{
+			print_error(is_error, "Wrong number of operands");
+		}
+		break;
+	case JSR:
+		if (operandDoesntExist)
+		{
+			print_error(is_error, "Wrong number of operands");
+		}
+		else if (comm->dest_miun != 1)
+		{
+			print_error(is_error, "The miun type doesn't can't be used with the command");
+		}
+		break;
+	case RTS:
+	case STOP:
+		if (operandDoesntExist != 1)
+		{
+			print_error(is_error, "Wrong number of operands");
+		}
+		break;
 	}
 }
 
@@ -622,7 +651,7 @@ void assign_symbol_adderss(command *comm, int symbol_index, int symbol_address)
 void print_error(int *is_error, const char* error_msg)
 {
 	/* print the error message */
-	printf("Error: %s.\n", error_msg);
+	printf("Error: %s (line %u).\n", error_msg, line_counter);
 	/* set the error to be true */
 	(*is_error) = 1;
 }
@@ -635,8 +664,13 @@ int next_line(FILE *file, char *buffer, size_t len)
 	char c;
 	int i;
 
+	/* increase the line counter, because we are reading a new line */
+	line_counter++;
+
+	/* set the memory of the buffer to 0 - clear the previous line we read */
 	memset(buffer, 0, len);
 
+	/* read the line char by char */
 	for (i = 0; i < len; i++)
 	{
 		c = fgetc(file);

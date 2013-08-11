@@ -7,14 +7,14 @@
 STRADD: .data 0
 STR: .string "abcdef"
 LASTCHAR: .data 0
-LEN: .data 0
+LEN: .data 816
 K: .data 0
-arar: .eeeee 0
 ; count length of string, print the original string, revese string, print reverse string
 MAIN: lea/0,0	STR{*LEN},STRADD
 	 jsr/0,0   COUNT
+s
 	 jsr/0,0   PRTSTR
-	 mov/1/1/0,0	STRADD{-5 3}, LASTCHAR{r3}
+	 mov/1/1/0,0	STRADD{-5}, LASTCHAR{r3}
 	 mov/1/1/1,0	STR{7}, r7
 	 add/0,0	COUNT{*K},r3
 	 dec/1/1/1,0 LASTCHAR{*K}
