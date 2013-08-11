@@ -40,6 +40,9 @@ void parse_file(char *file_name) {
 	 */
 	second_round();
 
+	/* Validate no double deleration of labels (regular, eternals and entries) */
+	check_double_labels();
+
 	/* Write files only if no error was found */
 	if (!is_error)
 	{
@@ -290,4 +293,54 @@ void free_counters()
 	free_symbol_table(sym_table);
 	free_symbol_table(entry_sym_table);
 	free_symbol_table(external_sym_table);
+}
+
+/*
+** Check that there is no double labels
+*/
+void check_double_labels()
+{
+	int i, j;
+
+	/* Check for doulbe label declerations */
+	for (i = 0; i < sym_table->counter; ++i)
+	{
+		for (j = 0; j < sym_table->counter; ++j)
+		{
+			if (i < j && 
+				strcmp(sym_table->symbols[i]->name, sym_table->symbols[j]->name) == 0)
+			{
+				printf("Error: label %s is decaled more than once\n", sym_table->symbols[i]->name);
+				is_error = 1;
+			}
+		}
+	}
+
+	/* Check for doulbe entry declerations */
+	for (i = 0; i < entry_sym_table->counter; ++i)
+	{
+		for (j = 0; j < entry_sym_table->counter; ++j)
+		{
+			if (i < j && 
+				strcmp(entry_sym_table->symbols[i]->name, entry_sym_table->symbols[j]->name) == 0)
+			{
+				printf("Error: entry %s is decaled more than once\n", entry_sym_table->symbols[i]->name);
+				is_error = 1;
+			}
+		}
+	}
+
+	/* Check for doulbe extern declerations */
+	for (i = 0; i < external_counter->index; ++i)
+	{
+		for (j = 0; j < external_counter->index; ++j)
+		{
+			if (i < j && 
+				strcmp(external_counter->data[i]->content.symbol_name, external_counter->data[j]->content.symbol_name) == 0)
+			{
+				printf("Error: extern %s is decaled more than once\n", external_counter->data[i]->content.symbol_name);
+				is_error = 1;
+			}
+		}
+	}
 }

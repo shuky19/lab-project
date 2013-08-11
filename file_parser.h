@@ -69,3 +69,8 @@ void initialize();
 ** Free all counter that was used in parsing process
 */
 void free_counters();
+
+/*
+** Check that there is no double labels
+*/
+void check_double_labels();
