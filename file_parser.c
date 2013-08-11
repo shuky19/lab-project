@@ -253,6 +253,7 @@ void handle_external_reference(char *symbol_name, int line_address) {
 	if(!was_found)
 	{
 		printf("Error: Label %s was not found in file nor in the external references. \n", symbol_name);
+		is_error = 1;
 	}
 }
 
