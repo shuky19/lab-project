@@ -99,6 +99,7 @@ typedef struct
 	instruction_line_type command;
 	instruction_content content;
 	int content_length;
+	int error;
 } instruction_line;
 
 typedef instruction_line *instruction_line_ptr;

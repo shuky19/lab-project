@@ -111,10 +111,13 @@ command_line *get_command_line(char *line, int *is_error)
 instruction_line *get_instruction_line(char *line, int *is_error)
 {
 	instruction_line* il = (instruction_line*) malloc_with_validation(sizeof(instruction_line));
+	
 	/* we try to get at most 20 parts - there might be a lot of arguments if its a
 	 * data instruction. */
 	char** lineParts = get_all_parts(line, 20, ", \t");
 	int instructionIndex = 0, labelLength;
+	
+	il->error = 0;
 
 	/* set the label (if exists) */
 	if (is_label(lineParts[0]))
@@ -159,6 +162,7 @@ instruction_line *get_instruction_line(char *line, int *is_error)
 		strcat(errorString, lineParts[instructionIndex]);
 		print_error(is_error, errorString);
 		free(errorString);
+		il->error = 1;
 	}
 
 	free_line_parts(lineParts, 20);

@@ -135,6 +135,11 @@ void handle_instruction(char *line) {
 	/* Get parsed instruction */
 	instruction_line *inst_line = get_instruction_line(line, &is_error);
 
+	if (inst_line->error)
+	{
+		return;
+	}
+
 	if (inst_line->command == DATA || inst_line->command == STRING) {
 		/* If this line contains symbols
 		 add them to sym_table */
