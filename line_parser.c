@@ -726,6 +726,12 @@ int next_line(FILE *file, char *buffer, size_t len)
 				buffer[i] = c;
 			}
 		}
+		/* Case when reached to the end of the file, but the line is not empty */
+		else if (i != 0)
+		{
+			buffer[i] = '0';
+			return i + 1;
+		}
 		else
 		{
 			return -1;
